@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "frontend",
     "rest_framework",
+    "auth_app.apps.AuthAppConfig",
 ]
 
 MIDDLEWARE = [
@@ -83,15 +84,15 @@ WSGI_APPLICATION = "shop_app.wsgi.application"
 #     }
 # }
 DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": "postgres_test",
-            "USER": "postgres",
-            "PASSWORD": "postgres",
-            "HOST": "localhost",
-            "PORT": "5432",
-        }
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres_test",
+        "USER": "postgres",
+        "PASSWORD": "postgres",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
+}
 
 
 # Password validation
