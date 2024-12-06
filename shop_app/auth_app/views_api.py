@@ -54,9 +54,13 @@ class UserLoginAPIView(APIView):
         :return: Response.
         """
         user_data = get_user_data(request.data)
-        user = User.objects.get(username=user_data["username"])
-        if user and user.check_password(user_data["password"]) and user.is_active:
-            login(request, user)
+        users = User.objects.filter(username=user_data.get("username", ""))
+        if (
+            users.count() == 1
+            and users[0].check_password(user_data.get("password", ""))
+            and users[0].is_active
+        ):
+            login(request, users[0])
             return Response(status=status.HTTP_200_OK)
         response = Response()
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR

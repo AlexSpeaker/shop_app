@@ -61,5 +61,4 @@ class UserSerializer(serializers.ModelSerializer[User]):
         :return: User.
         """
 
-        user = User.objects.create_user(**validated_data)
-        return user
+        return User.objects.create_user(**validated_data)

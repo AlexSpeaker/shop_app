@@ -22,10 +22,9 @@ def get_user_data(data: Dict[str, str]) -> Dict[str, str]:
             name_split if len(name_split) == 2 else (name_split[0], "")
         )
 
-    normalized_user_data = dict(
+    return dict(
         username=user_data.get("username", ""),
         first_name=first_name,
         last_name=last_name,
         password=user_data.get("password", ""),
     )
-    return normalized_user_data

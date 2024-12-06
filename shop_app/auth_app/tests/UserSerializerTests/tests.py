@@ -98,6 +98,28 @@ class UserSerializerTests(APITestCase):
         with self.assertRaises(ValidationError):
             serializer.is_valid(raise_exception=True)
 
+    def test_invalid_username_no_username(self) -> None:
+        """
+        Тест с невалидными данными: username отсутствует.
+
+        :return: None.
+        """
+        self.new_user_data.pop("username")
+        serializer = self.serializer_class(data=self.new_user_data)
+        with self.assertRaises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+
+    def test_invalid_password_no_password(self) -> None:
+        """
+        Тест с невалидными данными: password отсутствует.
+
+        :return: None.
+        """
+        self.new_user_data.pop("password")
+        serializer = self.serializer_class(data=self.new_user_data)
+        with self.assertRaises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+
     @classmethod
     def tearDownClass(cls) -> None:
         """
