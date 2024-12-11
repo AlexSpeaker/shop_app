@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Manager
 
 
 def avatar_directory_path(instance: "Profile", filename: str) -> str:
@@ -35,5 +34,3 @@ class Profile(models.Model):
     avatar = models.ImageField(
         null=True, blank=True, upload_to=avatar_directory_path, default=None
     )
-
-    objects: Manager["Profile"]

@@ -27,6 +27,18 @@ class RegisterUserSerializer(serializers.ModelSerializer[User]):
         model = User
         fields = ["username", "password", "name"]
 
+    @staticmethod
+    def validate_username(value: str) -> str:
+        """
+        Проверка уникальности имени пользователя.
+
+        :param value: Введённый username.
+        :return: Проверенный username.
+        """
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Это имя пользователя уже занято.")
+        return value
+
     def create(self, validated_data: Dict[str, Any]) -> User:
         """
         Функция создаст пользователя и его профиль.

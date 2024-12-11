@@ -1,11 +1,12 @@
-from auth_app.serializers import LoginUserSerializer, RegisterUserSerializer
-from auth_app.utils import get_user_data
 from django.contrib.auth import authenticate, login, logout
 from drf_spectacular.utils import OpenApiResponse, extend_schema
-from rest_framework import status
+from rest_framework import permissions, status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from auth_app.serializers import LoginUserSerializer, RegisterUserSerializer
+from auth_app.utils import get_user_data
 
 
 class RegisterUserAPIView(APIView):
@@ -82,6 +83,7 @@ class UserLoginAPIView(APIView):
         )
         if not user:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        login(request, user)
         return Response(status=status.HTTP_200_OK)
 
 
@@ -90,8 +92,11 @@ class UserLogoutAPIView(APIView):
     Класс выхода пользователя из системы.
     """
 
+    permission_classes = (permissions.IsAuthenticated,)
+
     @staticmethod
     @extend_schema(
+        request=None,
         responses={
             200: OpenApiResponse(description="Успешная операция."),
         },

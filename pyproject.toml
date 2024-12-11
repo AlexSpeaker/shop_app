@@ -35,5 +35,4 @@ plugins = [
 ]
 
 [tool.django-stubs]
-django_settings_module = "shop_app"
-strict_settings = true
+django_settings_module = "shop_app.settings"

@@ -1,5 +1,6 @@
-from auth_app.views_api import RegisterUserAPIView, UserLoginAPIView, UserLogoutAPIView
 from django.urls import path
+
+from auth_app.views_api import RegisterUserAPIView, UserLoginAPIView, UserLogoutAPIView
 
 urlpatterns = [
     path("sign-up", RegisterUserAPIView.as_view(), name="registration"),
