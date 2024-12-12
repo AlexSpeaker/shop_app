@@ -131,6 +131,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
+MEDIA_ROOT = BASE_DIR / "uploads"
+MEDIA_URL = "/media/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -146,3 +148,4 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Учебный проект",
     "VERSION": "1.0.0",
 }
+FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024

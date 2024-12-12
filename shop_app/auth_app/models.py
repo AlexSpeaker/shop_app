@@ -1,3 +1,6 @@
+from typing import Any
+
+from auth_app.utils import delete_file
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -46,13 +49,30 @@ class Profile(models.Model):
 
     @property
     def fullName(self) -> str:
+        """
+        Функция вернёт полное ФИО пользователя.
+
+        :return: ФИО пользователя.
+        """
         return " ".join([self.surname, self.name, self.patronymic]).strip()
 
     @fullName.setter
     def fullName(self, value: str) -> None:
+        """
+        Функция принимает строку и распределяет данные между surname, name, patronymic.
+        Распределение такое:
+        - Если передано 1 слово - это будет name.
+        - Если передано 2 слова - это будет surname, name соответственно.
+        - Если передано 3 слова - это будет surname, name, patronymic соответственно.
+        - Учитываются только первые 3 слова, остальные игнорируются.
+
+        :param value: Строка с данными.
+        :return: None.
+        """
+
         full_name_list = value.strip().split()
-        if len(full_name_list) == 3:
-            self.surname, self.name, self.patronymic = full_name_list
+        if len(full_name_list) >= 3:
+            self.surname, self.name, self.patronymic = full_name_list[:3]
         elif len(full_name_list) == 2:
             self.surname, self.name, self.patronymic = (
                 full_name_list[0],
@@ -65,5 +85,17 @@ class Profile(models.Model):
                 full_name_list[0],
                 "",
             )
-        else:
-            self.surname, self.name, self.patronymic = full_name_list[:3]
+
+    def delete(self, *args: Any, **kwargs: Any) -> Any:
+        """Подчищаем за собой при удалении профиля."""
+        if self.avatar:
+            delete_file(self.avatar.path)
+        return super().delete(*args, **kwargs)
+
+    def save(self, *args: Any, **kwargs: Any) -> Any:
+        """Подчищаем за собой при сохранении профиля."""
+        if self.pk:
+            old_instance = Profile.objects.get(pk=self.pk)
+            if old_instance.avatar and old_instance.avatar != self.avatar:
+                delete_file(old_instance.avatar.path)
+        return super().save(*args, **kwargs)

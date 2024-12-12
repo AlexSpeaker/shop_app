@@ -1,4 +1,5 @@
 import json
+import os
 from json import JSONDecodeError
 from typing import Any, Dict
 
@@ -32,3 +33,14 @@ class PhoneValidator(RegexValidator):
         regex = r"^\+?1?\d{9,15}$"
         message = "Номер телефона должен быть введен в формате: '+9999999999'. Допускается количество цифр не более 15."
         super().__init__(regex=regex, message=message)
+
+
+def delete_file(path: str) -> None:
+    """
+    Функция удаляет файл.
+
+    :param path: Путь к файлу.
+    :return: None.
+    """
+    if os.path.isfile(path):
+        os.remove(path)

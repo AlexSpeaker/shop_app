@@ -1,4 +1,5 @@
 from auth_app.serializers import (
+    InAvatarSerializer,
     LoginUserSerializer,
     ProfileSerializer,
     RegisterUserSerializer,
@@ -130,7 +131,10 @@ class UserProfileAPIView(APIView):
 
     @extend_schema(
         request=None,
-        responses=ProfileSerializer,
+        responses={
+            200: ProfileSerializer,
+            401: OpenApiResponse(description="Пользователь не прошёл аутентификацию."),
+        },
         description="Получение данных пользователя.",
         tags=("Profile",),
     )
@@ -142,14 +146,17 @@ class UserProfileAPIView(APIView):
         :return: Response.
         """
         if not request.user.is_authenticated:
-            return Response()
-
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         user_serializer = self.serializer_class(instance=request.user.profile)
         return Response(user_serializer.data)
 
     @extend_schema(
         request=ProfileSerializer,
-        responses=ProfileSerializer,
+        responses={
+            200: ProfileSerializer,
+            400: OpenApiResponse(description="Неверный запрос."),
+            401: OpenApiResponse(description="Пользователь не прошёл аутентификацию."),
+        },
         description="Обновление данных пользователя.",
         tags=("Profile",),
     )
@@ -161,8 +168,50 @@ class UserProfileAPIView(APIView):
         :return: Response.
         """
         if not request.user.is_authenticated:
-            return Response()
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         user_serializer = self.serializer_class(data=request.data)
         if user_serializer.is_valid():
-            user_serializer.update(validated_data=user_serializer.validated_data, instance=request.user.profile)
-        return Response(user_serializer.data)
+            user_serializer.update(
+                validated_data=user_serializer.validated_data,
+                instance=request.user.profile,
+            )
+            return Response(request.data)
+        return Response(request.data, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserProfileAvatarAPIView(APIView):
+    """
+    Класс аватарки пользователя.
+    """
+
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = InAvatarSerializer
+
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiResponse(description="Успешная операция."),
+            400: OpenApiResponse(description="Неверный запрос."),
+            401: OpenApiResponse(description="Пользователь не прошёл аутентификацию."),
+        },
+        description="Обновление аватарки пользователя. Принимает файл аватарки (data name - avatar).",
+        tags=("Profile",),
+    )
+    def post(self, request: Request) -> Response:
+        """
+        Обновление аватарки пользователя.
+
+        :param request: Request.
+        :return: Response.
+        """
+        if not request.user.is_authenticated:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        user_serializer = self.serializer_class(data=request.data)
+        if user_serializer.is_valid():
+            user_serializer.update(
+                instance=request.user.profile,
+                validated_data=user_serializer.validated_data,
+            )
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
