@@ -31,8 +31,11 @@ build-backend = "poetry.core.masonry.api"
 [tool.mypy]
 strict = true
 plugins = [
-    "mypy_django_plugin.main"
+    "mypy_django_plugin.main",
+    "mypy_drf_plugin.main"
 ]
+ignore_missing_model_attributes = true
 
 [tool.django-stubs]
-django_settings_module = "shop_app.settings"
+django_settings_module = "shop_app.settings.base"
+strict_settings = true

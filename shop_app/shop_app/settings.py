@@ -142,7 +142,7 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Ваше API",
-    "DESCRIPTION": "Описание вашего API",
+    "TITLE": "API интернет-магазина",
+    "DESCRIPTION": "Учебный проект",
     "VERSION": "1.0.0",
 }

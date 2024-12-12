@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 def avatar_directory_path(instance: "Profile", filename: str) -> str:
@@ -27,10 +28,16 @@ class Profile(models.Model):
     """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    name = models.CharField(max_length=50, blank=False, null=False)
-    surname = models.CharField(max_length=50, blank=True, default="")
-    patronymic = models.CharField(max_length=50, blank=True, default="")
-    phone = models.CharField(max_length=17, default=None, null=True)
+    name = models.CharField(_("name"), max_length=50, blank=False, null=False)
+    surname = models.CharField(_("surname"), max_length=50, blank=True, default="")
+    patronymic = models.CharField(
+        _("patronymic"), max_length=50, blank=True, default=""
+    )
+    phone = models.CharField(_("phone"), max_length=17, default=None, null=True)
     avatar = models.ImageField(
-        null=True, blank=True, upload_to=avatar_directory_path, default=None
+        _("avatar"),
+        null=True,
+        blank=True,
+        upload_to=avatar_directory_path,
+        default=None,
     )
