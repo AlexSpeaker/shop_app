@@ -1,9 +1,13 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from django.contrib.auth.models import User
+from django.core.validators import EmailValidator
+from django.db.models.fields.files import ImageFieldFile
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from .models import Profile
+from .utils import PhoneValidator
 
 
 class RegisterUserSerializer(serializers.ModelSerializer[User]):
@@ -66,3 +70,51 @@ class LoginUserSerializer(serializers.Serializer[Dict[str, Any]]):
         required=True,
     )
     username = serializers.CharField(required=True, min_length=4, max_length=50)
+
+
+class AvatarSerializer(serializers.Serializer[Dict[str, Any]]):
+    """
+    Класс-сериализатор для аватарки пользователя.
+    """
+    src = serializers.CharField(default=None, allow_null=True)
+    alt = serializers.CharField(default="No Image")
+
+    @staticmethod
+    def get_src(instance: Any) -> Optional[str]:
+        """
+        Функция проверит, является ли объект ImageFieldFile и вернёт либо путь к картинке, либо None.
+
+        :param instance: Объект.
+        :return: Если объект ImageFieldFile, то вернёт путь к картинке, иначе None.
+        """
+        return instance.url if isinstance(instance, ImageFieldFile) else None
+
+
+class ProfileSerializer(serializers.ModelSerializer[Profile]):
+    """
+    Класс-сериализатор для профиля пользователя.
+    """
+    fullName = serializers.CharField(min_length=2, max_length=150, required=True)
+    email = serializers.CharField(required=False, validators=[EmailValidator()])
+    phone = serializers.CharField(required=False, validators=[PhoneValidator()])
+    avatar = AvatarSerializer(required=False, allow_null=True)
+
+    class Meta:
+        model = Profile
+        fields = ["fullName", "email", "phone", "avatar"]
+
+    @staticmethod
+    def validate_avatar(image: Any) -> Optional[ImageFieldFile]:
+        """
+        Функция проверит входящий объект. Ожидаем ImageFieldFile.
+
+        :param image: Объект.
+        :return: Если объект не ImageFieldFile, то вернёт None.
+            Если ImageFieldFile, то проверит размер и вернёт ImageFieldFile.
+        """
+        if not isinstance(image, ImageFieldFile):
+            return None
+        max_file_size = 1000000
+        if image.size > max_file_size:
+            raise ValidationError(f"Файл слишком большой! Допустимый размер: {max_file_size} Б.")
+        return image

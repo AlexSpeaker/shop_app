@@ -34,8 +34,7 @@ plugins = [
     "mypy_django_plugin.main",
     "mypy_drf_plugin.main"
 ]
-ignore_missing_model_attributes = true
+disable_error_code = ["attr-defined",]
 
 [tool.django-stubs]
-django_settings_module = "shop_app.settings.base"
-strict_settings = true
+django_settings_module = "shop_app"

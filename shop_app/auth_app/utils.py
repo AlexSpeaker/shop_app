@@ -2,6 +2,8 @@ import json
 from json import JSONDecodeError
 from typing import Any, Dict
 
+from django.core.validators import RegexValidator
+
 
 def get_user_data(data: Dict[str, str]) -> Dict[str, Any]:
     """
@@ -19,3 +21,14 @@ def get_user_data(data: Dict[str, str]) -> Dict[str, Any]:
             pass
 
     return normalize_data if normalize_data else data
+
+
+class PhoneValidator(RegexValidator):
+    """
+    Класс-валидатор номера телефона.
+    """
+
+    def __init__(self) -> None:
+        regex = r"^\+?1?\d{9,15}$"
+        message = "Номер телефона должен быть введен в формате: '+9999999999'. Допускается количество цифр не более 15."
+        super().__init__(regex=regex, message=message)

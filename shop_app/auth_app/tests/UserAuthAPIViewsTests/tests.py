@@ -3,13 +3,12 @@ from random import choices
 from string import ascii_letters
 from typing import Dict
 
+from auth_app.tests.utils import get_user_data_from_frontend
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APITestCase
-
-from auth_app.tests.utils import get_user_data_from_frontend
 
 
 class RegisterUserAPIViewTests(APITestCase):

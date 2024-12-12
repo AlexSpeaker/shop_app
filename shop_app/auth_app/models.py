@@ -24,6 +24,7 @@ class Profile(models.Model):
     **surname** - Фамилия. \n
     **patronymic** - Отчество. \n
     **phone** - Телефон пользователя. \n
+    **email** - Почта пользователя. \n
     **avatar** - Относительный путь к аватарке пользователя.
     """
 
@@ -33,7 +34,8 @@ class Profile(models.Model):
     patronymic = models.CharField(
         _("patronymic"), max_length=50, blank=True, default=""
     )
-    phone = models.CharField(_("phone"), max_length=17, default=None, null=True)
+    phone = models.CharField(_("phone"), max_length=17, blank=True, default="")
+    email = models.EmailField(_("email"), max_length=254, blank=True, default="")
     avatar = models.ImageField(
         _("avatar"),
         null=True,
@@ -41,3 +43,27 @@ class Profile(models.Model):
         upload_to=avatar_directory_path,
         default=None,
     )
+
+    @property
+    def fullName(self) -> str:
+        return " ".join([self.surname, self.name, self.patronymic]).strip()
+
+    @fullName.setter
+    def fullName(self, value: str) -> None:
+        full_name_list = value.strip().split()
+        if len(full_name_list) == 3:
+            self.surname, self.name, self.patronymic = full_name_list
+        elif len(full_name_list) == 2:
+            self.surname, self.name, self.patronymic = (
+                full_name_list[0],
+                full_name_list[1],
+                "",
+            )
+        elif len(full_name_list) == 1:
+            self.surname, self.name, self.patronymic = (
+                "",
+                full_name_list[0],
+                "",
+            )
+        else:
+            self.surname, self.name, self.patronymic = full_name_list[:3]

@@ -2,11 +2,10 @@ from random import choices
 from string import ascii_letters
 from typing import Dict
 
+from auth_app.serializers import RegisterUserSerializer
 from django.contrib.auth.models import User
 from rest_framework.exceptions import ValidationError
 from rest_framework.test import APITestCase
-
-from auth_app.serializers import RegisterUserSerializer
 
 
 class RegisterUserSerializerTests(APITestCase):
