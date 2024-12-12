@@ -144,3 +144,4 @@ prettifier.py
 __linters/
 
 /__database/
+/shop_app/uploads/
