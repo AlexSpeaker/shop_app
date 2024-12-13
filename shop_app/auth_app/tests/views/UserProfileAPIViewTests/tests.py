@@ -21,18 +21,18 @@ class UserProfileAPIViewTests(APITestCase):
 
     __files_for_test_dir = Path(__file__).parent.parent.parent / "files_for_test"
     __valid_file_path = __files_for_test_dir / "valid_file.png"
-    __name = "".join(choices(ascii_letters, k=6))
-    __surname = "".join(choices(ascii_letters, k=6))
-    __patronymic = "".join(choices(ascii_letters, k=6))
-    __full_name = " ".join(
+    name = "".join(choices(ascii_letters, k=6))
+    surname = "".join(choices(ascii_letters, k=6))
+    patronymic = "".join(choices(ascii_letters, k=6))
+    full_name = " ".join(
         [
-            __surname,
-            __name,
-            __patronymic,
+            surname,
+            name,
+            patronymic,
         ]
     )
-    __email = "".join(["".join(choices(ascii_letters, k=10)), "@gmail.com"])
-    __phone_number = "".join(choices("0123456789", k=9))
+    email = "".join(["".join(choices(ascii_letters, k=10)), "@gmail.com"])
+    phone_number = "".join(choices("0123456789", k=9))
     url = reverse("profile")
 
     @classmethod
@@ -62,9 +62,9 @@ class UserProfileAPIViewTests(APITestCase):
         :return: None.
         """
         self.valid_user_data: Dict[str, str] = {
-            "fullName": self.__full_name,
-            "email": self.__email,
-            "phone": self.__phone_number,
+            "fullName": self.full_name,
+            "email": self.email,
+            "phone": self.phone_number,
         }
         self.client.force_authenticate(user=self.user)
 
@@ -108,6 +108,84 @@ class UserProfileAPIViewTests(APITestCase):
         response: Response = self.client.get(self.url)
         self.assertEqual(response.status_code // 100, 4)
 
+    def test_post_auth_user_profile_valid_data(self) -> None:
+        """
+        Обновим профиль валидными данными у пользователя вошедшего в систему.
+
+        :return: None.
+        """
+        response: Response = self.client.post(self.url, data=self.valid_user_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(self.user.profile.name, self.name)
+        self.assertEqual(self.user.profile.surname, self.surname)
+        self.assertEqual(self.user.profile.patronymic, self.patronymic)
+        self.assertEqual(self.user.profile.email, self.email)
+        self.assertEqual(self.user.profile.phone, self.phone_number)
+
+    def test_post_no_auth_user_profile_valid_data(self) -> None:
+        """
+        Обновим профиль валидными данными у пользователя не вошедшего в систему.
+
+        :return: None.
+        """
+        self.client.logout()
+        response: Response = self.client.post(self.url, data=self.valid_user_data)
+        self.assertEqual(response.status_code // 100, 4)
+
+    def test_post_auth_user_profile_invalid_full_name(self) -> None:
+        """
+        Тест обновления профиля с невалидными данными: пустой fullName.
+        :return:
+        """
+        self.valid_user_data["fullName"] = ""
+        response: Response = self.client.post(self.url, data=self.valid_user_data)
+        self.assertEqual(response.status_code // 100, 4)
+
+    def test_post_auth_user_profile_no_full_name(self) -> None:
+        """
+        Тест обновления профиля с невалидными данными: fullName отсутствует.
+        :return:
+        """
+        self.valid_user_data.pop("fullName")
+        response: Response = self.client.post(self.url, data=self.valid_user_data)
+        self.assertEqual(response.status_code // 100, 4)
+
+    def test_post_auth_user_profile_invalid_email(self) -> None:
+        """
+        Тест обновления профиля с невалидными данными: плохой email.
+        :return:
+        """
+        self.valid_user_data["email"] = "".join(choices(ascii_letters, k=6))
+        response: Response = self.client.post(self.url, data=self.valid_user_data)
+        self.assertEqual(response.status_code // 100, 4)
+
+    def test_post_auth_user_profile_no_email(self) -> None:
+        """
+        Тест обновления профиля с невалидными данными: email отсутствует.
+        :return:
+        """
+        self.valid_user_data.pop("email")
+        response: Response = self.client.post(self.url, data=self.valid_user_data)
+        self.assertEqual(response.status_code // 100, 4)
+
+    def test_post_auth_user_profile_invalid_phone(self) -> None:
+        """
+        Тест обновления профиля с невалидными данными: плохой phone.
+        :return:
+        """
+        self.valid_user_data["phone"] = "".join(choices(ascii_letters, k=6))
+        response: Response = self.client.post(self.url, data=self.valid_user_data)
+        self.assertEqual(response.status_code // 100, 4)
+
+    def test_post_auth_user_profile_no_phone(self) -> None:
+        """
+        Тест обновления профиля с невалидными данными: phone отсутствует.
+        :return:
+        """
+        self.valid_user_data.pop("phone")
+        response: Response = self.client.post(self.url, data=self.valid_user_data)
+        self.assertEqual(response.status_code // 100, 4)
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -116,7 +194,7 @@ class UserProfileAPIViewTests(APITestCase):
 
         :return: None.
         """
-        cls.user.profile.delete() # Удалит так же файл картинки
+        cls.user.profile.delete()  # Удалит так же файл картинки
         cls.user.delete()
         assert Profile.objects.count() == 0
         assert User.objects.count() == 0
