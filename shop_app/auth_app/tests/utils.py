@@ -1,5 +1,10 @@
 import json
+from random import choices
+from string import ascii_letters
 from typing import Dict
+
+from auth_app.models import Profile
+from django.contrib.auth.models import User
 
 
 def get_user_data_from_frontend(new_user_data: Dict[str, str]) -> Dict[str, list[str]]:
@@ -12,3 +17,20 @@ def get_user_data_from_frontend(new_user_data: Dict[str, str]) -> Dict[str, list
     return {
         new_user_key_str: [""],
     }
+
+
+def get_user_with_profile() -> User:
+    """
+    Функция создаёт пользователя вместе с его профилем.
+
+    :return: User.
+    """
+    user = User.objects.create_user(
+        username="".join(choices(ascii_letters, k=6)),
+        password="".join(choices(ascii_letters, k=6)),
+    )
+    user.profile = Profile.objects.create(
+        user=user, name="E".join(choices(ascii_letters, k=6))
+    )
+    user.save()
+    return user

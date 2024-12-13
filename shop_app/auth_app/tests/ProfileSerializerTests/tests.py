@@ -4,6 +4,7 @@ from typing import Dict
 
 from auth_app.models import Profile
 from auth_app.serializers import ProfileSerializer
+from auth_app.tests.utils import get_user_with_profile
 from django.contrib.auth.models import User
 from rest_framework.exceptions import ValidationError
 from rest_framework.test import APITestCase
@@ -39,14 +40,7 @@ class ProfileSerializerTests(APITestCase):
         :return: None.
         """
         super().setUpClass()
-        cls.user = User.objects.create_user(
-            username="".join(choices(ascii_letters, k=6)),
-            password="".join(choices(ascii_letters, k=6)),
-        )
-        cls.user.profile = Profile.objects.create(
-            user=cls.user, name="E".join(choices(ascii_letters, k=6))
-        )
-        cls.user.save()
+        cls.user = get_user_with_profile()
 
     def setUp(self) -> None:
         """
