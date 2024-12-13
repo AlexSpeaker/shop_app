@@ -1,4 +1,5 @@
 from auth_app.views_api import (
+    ChangePasswordAPIView,
     RegisterUserAPIView,
     UserLoginAPIView,
     UserLogoutAPIView,
@@ -13,4 +14,5 @@ urlpatterns = [
     path("sign-out", UserLogoutAPIView.as_view(), name="logout"),
     path("profile", UserProfileAPIView.as_view(), name="profile"),
     path("profile/avatar", UserProfileAvatarAPIView.as_view(), name="profile_avatar"),
+    path("profile/password", ChangePasswordAPIView.as_view(), name="profile_password"),
 ]

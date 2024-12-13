@@ -1,12 +1,13 @@
 from typing import Any, Dict, Optional
 
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import User
 from django.core.validators import EmailValidator
 from django.db.models.fields.files import ImageFieldFile
 from rest_framework import serializers
 
 from .models import Profile
-from .utils import PhoneValidator, delete_file
+from .utils import PasswordValidator, PhoneValidator, delete_file
 
 
 class RegisterUserSerializer(serializers.ModelSerializer[User]):
@@ -16,10 +17,10 @@ class RegisterUserSerializer(serializers.ModelSerializer[User]):
 
     password = serializers.CharField(
         write_only=True,
-        min_length=8,
-        max_length=50,
-        style={"input_type": "password"},
         required=True,
+        validators=[
+            PasswordValidator(),
+        ],
     )
     name = serializers.CharField(
         required=True, min_length=2, max_length=50, write_only=True
@@ -63,10 +64,10 @@ class LoginUserSerializer(serializers.Serializer[Dict[str, Any]]):
 
     password = serializers.CharField(
         write_only=True,
-        min_length=8,
-        max_length=50,
-        style={"input_type": "password"},
         required=True,
+        validators=[
+            PasswordValidator(),
+        ],
     )
     username = serializers.CharField(required=True, min_length=4, max_length=50)
 
@@ -123,3 +124,43 @@ class InAvatarSerializer(serializers.ModelSerializer[Profile]):
         if old_avatar:
             delete_file(old_avatar.path)
         return super().update(instance=instance, validated_data=validated_data)
+
+
+class ChangePasswordSerializer(serializers.Serializer[AbstractBaseUser]):
+    """
+    Класс-сериализатор для смены пароля пользователя.
+    """
+
+    currentPassword = serializers.CharField(
+        write_only=True, required=True, validators=[PasswordValidator()]
+    )
+    newPassword = serializers.CharField(
+        write_only=True, required=True, validators=[PasswordValidator()]
+    )
+
+    def validate_currentPassword(self, value: str) -> str:
+        """
+        Проверяем текущий пароль.
+
+        :param value: Пароль.
+        :return: Пароль.
+        """
+        if self.instance is None:
+            raise serializers.ValidationError("Нет переданного пользователя.")
+        if not self.instance.check_password(value):
+            raise serializers.ValidationError("Не верный пароль.")
+        return value
+
+    def update(
+        self, instance: AbstractBaseUser, validated_data: Dict[str, Any]
+    ) -> AbstractBaseUser:
+        """
+        Обновляем пароль пользователю.
+
+        :param instance: Пользователь.
+        :param validated_data: Проверенные данные.
+        :return: Пользователь.
+        """
+        instance.set_password(validated_data["newPassword"])
+        instance.save()
+        return instance

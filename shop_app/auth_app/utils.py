@@ -4,6 +4,7 @@ from json import JSONDecodeError
 from typing import Any, Dict
 
 from django.core.validators import RegexValidator
+from rest_framework.exceptions import ValidationError
 
 
 def get_user_data(data: Dict[str, str]) -> Dict[str, Any]:
@@ -44,3 +45,29 @@ def delete_file(path: str) -> None:
     """
     if os.path.isfile(path):
         os.remove(path)
+
+
+class PasswordValidator:
+    """
+    Класс-валидатор для пароля.
+    """
+
+    def __init__(self) -> None:
+        self.min_length = 8
+        self.max_length = 50
+        self.message = (
+            f"Пароль должен содержать не менее {self.min_length} символов, "
+            f"пароль должен содержать не более {self.max_length} символов."
+        )
+
+    def __call__(self, value: str) -> None:
+        """
+        Список проверок.
+
+        :param value: Пароль.
+        :return: None.
+        """
+
+        # Проверка длины пароля
+        if len(value) < self.min_length or len(value) > self.max_length:
+            raise ValidationError(self.message)
