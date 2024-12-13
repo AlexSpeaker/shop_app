@@ -136,7 +136,8 @@ class UserProfileAPIViewTests(APITestCase):
     def test_post_auth_user_profile_invalid_full_name(self) -> None:
         """
         Тест обновления профиля с невалидными данными: пустой fullName.
-        :return:
+
+        :return: None.
         """
         self.valid_user_data["fullName"] = ""
         response: Response = self.client.post(self.url, data=self.valid_user_data)
@@ -145,7 +146,8 @@ class UserProfileAPIViewTests(APITestCase):
     def test_post_auth_user_profile_no_full_name(self) -> None:
         """
         Тест обновления профиля с невалидными данными: fullName отсутствует.
-        :return:
+
+        :return: None.
         """
         self.valid_user_data.pop("fullName")
         response: Response = self.client.post(self.url, data=self.valid_user_data)
@@ -154,7 +156,8 @@ class UserProfileAPIViewTests(APITestCase):
     def test_post_auth_user_profile_invalid_email(self) -> None:
         """
         Тест обновления профиля с невалидными данными: плохой email.
-        :return:
+
+        :return: None.
         """
         self.valid_user_data["email"] = "".join(choices(ascii_letters, k=6))
         response: Response = self.client.post(self.url, data=self.valid_user_data)
@@ -163,7 +166,8 @@ class UserProfileAPIViewTests(APITestCase):
     def test_post_auth_user_profile_no_email(self) -> None:
         """
         Тест обновления профиля с невалидными данными: email отсутствует.
-        :return:
+
+        :return: None.
         """
         self.valid_user_data.pop("email")
         response: Response = self.client.post(self.url, data=self.valid_user_data)
@@ -172,7 +176,8 @@ class UserProfileAPIViewTests(APITestCase):
     def test_post_auth_user_profile_invalid_phone(self) -> None:
         """
         Тест обновления профиля с невалидными данными: плохой phone.
-        :return:
+
+        :return: None.
         """
         self.valid_user_data["phone"] = "".join(choices(ascii_letters, k=6))
         response: Response = self.client.post(self.url, data=self.valid_user_data)
@@ -181,7 +186,8 @@ class UserProfileAPIViewTests(APITestCase):
     def test_post_auth_user_profile_no_phone(self) -> None:
         """
         Тест обновления профиля с невалидными данными: phone отсутствует.
-        :return:
+
+        :return: None.
         """
         self.valid_user_data.pop("phone")
         response: Response = self.client.post(self.url, data=self.valid_user_data)

@@ -84,6 +84,8 @@ WSGI_APPLICATION = "shop_app.wsgi.application"
 #         "NAME": BASE_DIR / "db.sqlite3",
 #     }
 # }
+
+# Проект демонстрационный, поэтому данные в открытом виде:
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
