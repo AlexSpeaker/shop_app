@@ -11,7 +11,7 @@ class InAvatarSerializerTests(APITestCase):
     Класс Тест для сериализатора InAvatarSerializer.
     """
 
-    files_for_test_dir = Path(__file__).parent.parent / "files_for_test"
+    files_for_test_dir = Path(__file__).parent.parent.parent / "files_for_test"
     valid_file_path = files_for_test_dir / "valid_file.png"
     invalid_file_path = files_for_test_dir / "no_valid_file.txt"
     serializer_class = InAvatarSerializer

@@ -170,7 +170,7 @@ class UserProfileAPIView(APIView):
                 validated_data=user_serializer.validated_data,
                 instance=request.user.profile,
             )
-            return Response(request.data)
+            return Response(self.serializer_class(instance=request.user.profile).data)
         return Response(request.data, status=status.HTTP_400_BAD_REQUEST)
 
 
