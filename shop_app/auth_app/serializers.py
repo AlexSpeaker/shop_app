@@ -80,15 +80,15 @@ class OutAvatarSerializer(serializers.Serializer[Optional[Profile]]):
     alt = serializers.CharField(default="No Image")
 
     @staticmethod
-    def get_src(obj: Optional[ImageFieldFile]) -> Optional[str]:
+    def get_src(avatar: Optional[ImageFieldFile]) -> Optional[str]:
         """
-        Функция проверит obj. Если obj ImageFieldFile, то вернёт его url, иначе None.
+        Функция проверит avatar. Если существует, то вернёт его url, иначе None.
 
-        :param obj: Optional[ImageFieldFile].
-        :return: Если obj ImageFieldFile, то вернёт его url, иначе None.
+        :param avatar: Optional[ImageFieldFile].
+        :return: Если существует avatar, то вернёт его url, иначе None.
         """
-        if obj:
-            return obj.url
+        if avatar:
+            return avatar.url
         return None
 
 
@@ -120,7 +120,6 @@ class InAvatarSerializer(serializers.ModelSerializer[Profile]):
         """Функция удалит старый файл."""
 
         old_avatar = instance.avatar
-        new_avatar = validated_data["avatar"]
-        if old_avatar and new_avatar:
+        if old_avatar:
             delete_file(old_avatar.path)
         return super().update(instance=instance, validated_data=validated_data)

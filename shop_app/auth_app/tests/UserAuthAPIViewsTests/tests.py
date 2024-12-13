@@ -76,7 +76,7 @@ class RegisterUserAPIViewTests(APITestCase):
     def test_register_user_invalid_username_exists_username(self) -> None:
         """
         Тест регистрации с невалидными данными: существующий username.
-        Ожидаем статус 500 и никакого нового пользователя.
+        Ожидаем статус 400 и никакого нового пользователя.
         (Почему-то данные должны быть в такой форме:
         ключ - это словарь из данных пользователя, а значение не имеет значения,
         фронт шлёт именно так, поступим также...)
@@ -86,13 +86,13 @@ class RegisterUserAPIViewTests(APITestCase):
         self.new_user_data["username"] = self.exists_user_data["username"]
         data = get_user_data_from_frontend(self.new_user_data)
         response: Response = self.client.post(self.url, data)
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(User.objects.count(), 1)
 
     def test_register_user_invalid_username_less_than_four_characters(self) -> None:
         """
         Тест регистрации с невалидными данными: username меньше 4 символов.
-        Ожидаем статус 500 и никакого нового пользователя.
+        Ожидаем статус 400 и никакого нового пользователя.
         (Почему-то данные должны быть в такой форме:
         ключ - это словарь из данных пользователя, а значение не имеет значения,
         фронт шлёт именно так, поступим также...)
@@ -102,13 +102,13 @@ class RegisterUserAPIViewTests(APITestCase):
         self.new_user_data["username"] = "abc"
         data = get_user_data_from_frontend(self.new_user_data)
         response: Response = self.client.post(self.url, data)
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(User.objects.count(), 1)
 
     def test_register_user_invalid_name_less_than_two_characters(self) -> None:
         """
         Тест регистрации с невалидными данными: name меньше 2 символов.
-        Ожидаем статус 500 и никакого нового пользователя.
+        Ожидаем статус 400 и никакого нового пользователя.
         (Почему-то данные должны быть в такой форме:
         ключ - это словарь из данных пользователя, а значение не имеет значения,
         фронт шлёт именно так, поступим также...)
@@ -118,13 +118,13 @@ class RegisterUserAPIViewTests(APITestCase):
         self.new_user_data["name"] = "a"
         data = get_user_data_from_frontend(self.new_user_data)
         response: Response = self.client.post(self.url, data)
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(User.objects.count(), 1)
 
     def test_register_user_invalid_password_less_than_eight_characters(self) -> None:
         """
         Тест регистрации с невалидными данными: password меньше 8 символов.
-        Ожидаем статус 500 и никакого нового пользователя.
+        Ожидаем статус 400 и никакого нового пользователя.
         (Почему-то данные должны быть в такой форме:
         ключ - это словарь из данных пользователя, а значение не имеет значения,
         фронт шлёт именно так, поступим также...)
@@ -134,7 +134,7 @@ class RegisterUserAPIViewTests(APITestCase):
         self.new_user_data["password"] = "abcdefg"
         data = get_user_data_from_frontend(self.new_user_data)
         response: Response = self.client.post(self.url, data)
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(User.objects.count(), 1)
 
     @classmethod
@@ -209,7 +209,7 @@ class UserLoginAPIViewTests(APITestCase):
         self.user_data["username"] = "N".join(choices(ascii_letters, k=10))
         data = get_user_data_from_frontend(self.user_data)
         response: Response = self.client.post(self.url, data)
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(self.client.session.get("_auth_user_id"))
 
     def test_login_no_username(self) -> None:
@@ -224,7 +224,7 @@ class UserLoginAPIViewTests(APITestCase):
         self.user_data.pop("username")
         data = get_user_data_from_frontend(self.user_data)
         response: Response = self.client.post(self.url, data)
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(self.client.session.get("_auth_user_id"))
 
     def test_login_invalid_password(self) -> None:
@@ -239,7 +239,7 @@ class UserLoginAPIViewTests(APITestCase):
         self.user_data["password"] = "N".join(choices(ascii_letters, k=10))
         data = get_user_data_from_frontend(self.user_data)
         response: Response = self.client.post(self.url, data)
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(self.client.session.get("_auth_user_id"))
 
     def test_login_no_password(self) -> None:
@@ -254,7 +254,7 @@ class UserLoginAPIViewTests(APITestCase):
         self.user_data.pop("password")
         data = get_user_data_from_frontend(self.user_data)
         response: Response = self.client.post(self.url, data)
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(self.client.session.get("_auth_user_id"))
 
     @classmethod
