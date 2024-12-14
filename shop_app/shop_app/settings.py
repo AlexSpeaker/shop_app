@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "auth_app.apps.AuthAppConfig",
+    "product_app.apps.ProductAppConfig",
+    "order_app.apps.OrderAppConfig",
 ]
 
 MIDDLEWARE = [

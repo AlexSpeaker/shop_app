@@ -8,6 +8,7 @@ from auth_app.views_api import (
 )
 from django.urls import path
 
+app_name = "auth_app"
 urlpatterns = [
     path("sign-up", RegisterUserAPIView.as_view(), name="registration"),
     path("sign-in", UserLoginAPIView.as_view(), name="login"),
