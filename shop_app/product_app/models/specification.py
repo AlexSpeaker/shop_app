@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
 from product_app.models.product import Product
 
 
@@ -12,6 +11,7 @@ class Specification(models.Model):
     **value** - Значение спецификации. \n
     **product** - Продукт. \n
     """
+
     name = models.CharField(_("name"), max_length=500, null=False, blank=False)
     value = models.CharField(_("value"), max_length=500, null=False, blank=False)
     product = models.ForeignKey(

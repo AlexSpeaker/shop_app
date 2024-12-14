@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
 from product_app.models.product import Product
 
 
@@ -12,6 +11,7 @@ class ProductImage(models.Model):
     **image** - Изображение продукта. \n
     **product** - Продукт. \n
     """
+
     title = models.CharField(_("title"), max_length=500, null=False, blank=False)
     image = models.ImageField(_("image"), null=False, blank=False)
     product = models.ForeignKey(

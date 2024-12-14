@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
 from product_app.models.subcategory import SubCategory
 from product_app.models.tag import Tag
 
@@ -20,6 +19,7 @@ class Product(models.Model):
     **free_delivery** - Есть ли бесплатная доставка. \n
     **tags** - Теги продукта.
     """
+
     category = models.ForeignKey(
         SubCategory, on_delete=models.PROTECT, related_name="products"
     )

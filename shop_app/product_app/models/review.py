@@ -12,6 +12,7 @@ class Review(models.Model):
     **created_at** - Дата написания отзыва. \n
     **rate** - Оценка.
     """
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews")
     text = models.TextField(_("text"), null=False, blank=False, max_length=5000)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
