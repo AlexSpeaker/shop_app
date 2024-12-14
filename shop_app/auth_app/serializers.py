@@ -113,6 +113,8 @@ class InAvatarSerializer(serializers.ModelSerializer[Profile]):
     Класс-сериализатор для записи аватарки пользователя.
     """
 
+    avatar = serializers.ImageField(write_only=True, required=True)
+
     class Meta:
         model = Profile
         fields = ["avatar"]
