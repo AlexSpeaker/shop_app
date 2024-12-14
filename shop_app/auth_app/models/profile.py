@@ -32,13 +32,13 @@ class Profile(models.Model):
     """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    name = models.CharField(_("name"), max_length=50, blank=False, null=False)
-    surname = models.CharField(_("surname"), max_length=50, blank=True, default="")
+    name = models.CharField(_("name"), max_length=50, blank=True, null=False, default="")
+    surname = models.CharField(_("surname"), max_length=50, blank=True, null=False, default="")
     patronymic = models.CharField(
-        _("patronymic"), max_length=50, blank=True, default=""
+        _("patronymic"), max_length=50, blank=True, default="", null=False
     )
-    phone = models.CharField(_("phone"), max_length=17, blank=True, default="")
-    email = models.EmailField(_("email"), max_length=254, blank=True, default="")
+    phone = models.CharField(_("phone"), max_length=17, blank=True, default="", null=False)
+    email = models.EmailField(_("email"), max_length=254, blank=True, default="", null=False)
     avatar = models.ImageField(
         _("avatar"),
         null=True,

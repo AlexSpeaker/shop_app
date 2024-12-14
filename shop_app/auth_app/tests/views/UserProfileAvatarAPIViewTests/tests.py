@@ -121,7 +121,6 @@ class UserProfileAvatarAPIViewTests(APITestCase):
 
         :return: None.
         """
-        cls.user.profile.delete()  # Удалит так же файл картинки
         cls.user.delete()
         assert Profile.objects.count() == 0
         assert User.objects.count() == 0

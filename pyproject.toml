@@ -35,6 +35,7 @@ plugins = [
     "mypy_drf_plugin.main"
 ]
 disable_error_code = ["attr-defined",]
+ignore_missing_imports = true
 
 [tool.django-stubs]
 django_settings_module = "shop_app"
