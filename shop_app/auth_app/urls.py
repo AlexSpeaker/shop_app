@@ -1,11 +1,9 @@
-from auth_app.views_api import (
-    ChangePasswordAPIView,
-    RegisterUserAPIView,
-    UserLoginAPIView,
-    UserLogoutAPIView,
-    UserProfileAPIView,
-    UserProfileAvatarAPIView,
-)
+from auth_app.api_views.avatar_user import UserProfileAvatarAPIView
+from auth_app.api_views.login_user import UserLoginAPIView
+from auth_app.api_views.logout_user import UserLogoutAPIView
+from auth_app.api_views.password_user import ChangePasswordAPIView
+from auth_app.api_views.profile_user import UserProfileAPIView
+from auth_app.api_views.register_user import RegisterUserAPIView
 from django.urls import path
 
 app_name = "auth_app"

@@ -21,7 +21,7 @@ class UserLoginAPIViewTests(APITestCase):
         "password": "E".join(choices(ascii_letters, k=10)),
     }
     user: User
-    url = reverse("login")
+    url = reverse("auth_app:login")
 
     @classmethod
     def setUpClass(cls) -> None:

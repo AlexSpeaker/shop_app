@@ -1,7 +1,7 @@
 from random import choices
 from string import ascii_letters
 
-from auth_app.serializers import ChangePasswordSerializer
+from auth_app.serializers.password import ChangePasswordSerializer
 from django.contrib.auth.models import User
 from rest_framework.exceptions import ValidationError
 from rest_framework.test import APITestCase

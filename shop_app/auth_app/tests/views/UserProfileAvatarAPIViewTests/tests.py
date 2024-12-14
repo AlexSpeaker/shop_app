@@ -18,7 +18,7 @@ class UserProfileAvatarAPIViewTests(APITestCase):
     __files_for_test_dir = Path(__file__).parent.parent.parent / "files_for_test"
     __valid_file_path = __files_for_test_dir / "valid_file.png"
     __no_valid_file_path = __files_for_test_dir / "no_valid_file.txt"
-    url = reverse("profile_avatar")
+    url = reverse("auth_app:profile_avatar")
 
     @classmethod
     def setUpClass(cls) -> None:

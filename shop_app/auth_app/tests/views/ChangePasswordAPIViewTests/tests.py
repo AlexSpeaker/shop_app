@@ -19,7 +19,7 @@ class ChangePasswordAPIViewTests(APITestCase):
         "password": "".join(choices(ascii_letters, k=10)),
     }
     user: User
-    url = reverse("profile_password")
+    url = reverse("auth_app:profile_password")
 
     @classmethod
     def setUpClass(cls) -> None:

@@ -33,7 +33,7 @@ class UserProfileAPIViewTests(APITestCase):
     )
     email = "".join(["".join(choices(ascii_letters, k=10)), "@gmail.com"])
     phone_number = "".join(choices("0123456789", k=9))
-    url = reverse("profile")
+    url = reverse("auth_app:profile")
 
     @classmethod
     def setUpClass(cls) -> None:

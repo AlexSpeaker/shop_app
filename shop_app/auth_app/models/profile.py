@@ -28,7 +28,7 @@ class Profile(models.Model):
     **patronymic** - Отчество. \n
     **phone** - Телефон пользователя. \n
     **email** - Почта пользователя. \n
-    **avatar** - Относительный путь к аватарке пользователя.
+    **avatar** - Аватарка пользователя.
     """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
@@ -48,7 +48,7 @@ class Profile(models.Model):
     )
 
     @property
-    def fullName(self) -> str:
+    def full_name(self) -> str:
         """
         Функция вернёт полное ФИО пользователя.
 
@@ -56,8 +56,8 @@ class Profile(models.Model):
         """
         return " ".join([self.surname, self.name, self.patronymic]).strip()
 
-    @fullName.setter
-    def fullName(self, value: str) -> None:
+    @full_name.setter
+    def full_name(self, value: str) -> None:
         """
         Функция принимает строку и распределяет данные между surname, name, patronymic.
         Распределение такое:
@@ -99,3 +99,17 @@ class Profile(models.Model):
             if old_instance.avatar and old_instance.avatar != self.avatar:
                 delete_file(old_instance.avatar.path)
         return super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        """
+        Строковое представление.
+        :return: ФИО.
+        """
+        return self.full_name
+
+    def __repr__(self) -> str:
+        """
+        Строковое представление для отладки.
+        :return: Profile(ФИО).
+        """
+        return f"Profile({self.full_name})"

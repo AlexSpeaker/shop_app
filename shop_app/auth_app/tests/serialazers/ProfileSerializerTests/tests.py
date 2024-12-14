@@ -3,7 +3,7 @@ from string import ascii_letters
 from typing import Dict
 
 from auth_app.models import Profile
-from auth_app.serializers import ProfileSerializer
+from auth_app.serializers.profile import ProfileSerializer
 from auth_app.tests.utils import get_user_with_profile
 from django.contrib.auth.models import User
 from rest_framework.exceptions import ValidationError

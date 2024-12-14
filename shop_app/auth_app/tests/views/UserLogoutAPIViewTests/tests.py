@@ -19,7 +19,7 @@ class UserLogoutAPIViewTests(APITestCase):
         "password": "E".join(choices(ascii_letters, k=10)),
     }
     user: User
-    url = reverse("logout")
+    url = reverse("auth_app:logout")
 
     @classmethod
     def setUpClass(cls) -> None:

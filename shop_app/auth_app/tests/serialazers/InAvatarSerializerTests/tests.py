@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from auth_app.serializers import InAvatarSerializer
+from auth_app.serializers.avatar import InAvatarSerializer
 from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.exceptions import ValidationError
 from rest_framework.test import APITestCase
