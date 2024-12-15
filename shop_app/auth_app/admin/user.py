@@ -2,19 +2,17 @@ from typing import TYPE_CHECKING, Optional
 
 from auth_app.models import Profile
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
 if TYPE_CHECKING:
-    from django.contrib.admin import StackedInline as _StackedInline
-    from django.contrib.auth.admin import UserAdmin as _UserAdmin
 
-    ModelAdmin = _UserAdmin[User]
-    StackedInline = _StackedInline[Profile, User]
+    ModelAdmin = UserAdmin[User]
+    StackedInline = admin.StackedInline[Profile, User]
 else:
-    from django.contrib.auth.admin import UserAdmin
 
     ModelAdmin = UserAdmin
     StackedInline = admin.StackedInline

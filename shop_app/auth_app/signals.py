@@ -46,6 +46,7 @@ def delete_avatar_file_with_user_delete(instance: User, **kwargs: Any) -> None:
     if instance.profile and instance.profile.avatar:
         delete_file(instance.profile.avatar.path)
 
+
 @receiver(pre_save, sender=Profile)
 def delete_avatar_file_with_save_profile(instance: Profile, **kwargs: Any) -> None:
     """
