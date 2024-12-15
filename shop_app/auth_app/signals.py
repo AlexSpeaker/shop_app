@@ -21,6 +21,7 @@ def create_user_profile(instance: User, created: bool, **kwargs: Any) -> None:
     if created:
         Profile.objects.create(user=instance)
 
+
 @receiver(post_save, sender=User)
 def save_user_profile(instance: User, **kwargs: Any) -> None:
     """
@@ -31,6 +32,7 @@ def save_user_profile(instance: User, **kwargs: Any) -> None:
     :return: None.
     """
     instance.profile.save()
+
 
 @receiver(pre_delete, sender=User)
 def delete_avatar(instance: User, **kwargs: Any) -> None:
