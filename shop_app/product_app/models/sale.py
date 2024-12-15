@@ -13,7 +13,8 @@ class Sale(models.Model):
     **date_from** - Начало распродажи. \n
     **date_to** - Конец распродажи. \n
     **price** - Мнимая цена за продукт, якобы цена до распродажи (необязательно должна быть равна настоящей). \n
-    **sale_price** - Цена со скидкой.
+    **sale_price** - Цена со скидкой. \n
+    **created_at** - Дата и время создания акции.
     """
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="sales")
@@ -38,7 +39,28 @@ class Sale(models.Model):
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
     def clean(self) -> None:
+        """
+        Будут проведена валидация данных, ошибки будут отображаться в админ панели.
+
+        :return: None.
+        """
         super().clean()
+        if not self.date_from:
+            raise ValidationError(
+                {"date_from": "Это обязательное поле."}
+            )
+        if not self.date_to:
+            raise ValidationError(
+                {"date_to": "Это обязательное поле."}
+            )
+        if not self.price:
+            raise ValidationError(
+                {"price": "Это обязательное поле."}
+            )
+        if not self.sale_price:
+            raise ValidationError(
+                {"sale_price": "Это обязательное поле."}
+            )
         if self.date_from >= self.date_to:
             raise ValidationError(
                 {"date_to": "Конечная дата должна быть больше стартовой."}
@@ -53,4 +75,4 @@ class Sale(models.Model):
     class Meta:
         verbose_name = _("sale")
         verbose_name_plural = _("sales")
-        ordering = ("-created_at",)
+        ordering = ("-date_to",)

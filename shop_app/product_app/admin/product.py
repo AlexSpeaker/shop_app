@@ -6,6 +6,8 @@ from django.db.models import QuerySet
 from django.forms import BaseInlineFormSet as _BaseInlineFormSet
 from django.forms import ModelForm
 from django.http import HttpRequest
+from django.utils.html import format_html
+from django.utils.safestring import SafeString
 from django.utils.translation import gettext_lazy as _
 from product_app.models import Product, ProductImage, Review, Sale
 
@@ -26,10 +28,21 @@ else:
 
 
 class CustomInlineFormSet(BaseInlineFormSet):
+    """
+    Переопределяем класс BaseInlineFormSet.
+    """
     forms: Any
     obj: Optional[Product] = None
 
     def __init__(self, *args_c: Any, **kwargs_c: Any):
+        """
+        Добавим в известные поля (ещё не созданной сущности) значения по умолчанию.
+        Price - будет браться из рассматриваемого продукта.
+        Date_from - текущая дата.
+
+        :param args_c: Any.
+        :param kwargs_c: Any.
+        """
         super().__init__(*args_c, **kwargs_c)
         if self.obj:
             for _form in self.forms:
@@ -40,12 +53,20 @@ class CustomInlineFormSet(BaseInlineFormSet):
 
 
 class ProductImageInline(ImageTabularInline):
+    """
+    Inline класс изображений продукта.
+    """
+
     model = ProductImage
     verbose_name_plural = _("Images")
     extra = 1
 
 
 class ProductReviewsInline(ReviewTabularInline):
+    """
+    Inline класс отзывов на продукт.
+    """
+
     model = Review
     verbose_name_plural = _("Reviews")
     extra = 0
@@ -53,14 +74,44 @@ class ProductReviewsInline(ReviewTabularInline):
 
 
 class ProductSaleInline(SaleTabularInline):
+    """
+    Inline класс распродаж на продукт.
+    """
+
     model = Sale
     verbose_name_plural = _("Sales")
     extra = 1
     formset = CustomInlineFormSet
+    fields = ('created_at', 'date_from', 'date_to', 'price', 'sale_price', 'relevant')
+    readonly_fields = ('created_at', 'relevant')
+
+    @staticmethod
+    def relevant(obj: Sale) -> SafeString:
+        """
+        Функция покажет актуальна ли акция на данный момент.
+
+        :param obj: Sale.
+        :return: False, если не актуальна, иначе True (их представления в виде изображения).
+            Если объект ещё не создан, то вернёт 'Not defined'.
+        """
+        if obj.pk and obj.date_to and obj.date_to >= date.today():
+            return format_html('<img src="/static/admin/img/icon-yes.svg" alt="Yes" />')
+        elif obj.pk and obj.date_to and obj.date_to < date.today():
+            return format_html('<img src="/static/admin/img/icon-no.svg" alt="No" />')
+        return format_html(f'<p>{_("Not defined")}</p>')
 
     def get_formset(
         self, request: HttpRequest, obj: Optional[Product] = None, **kwargs: Any
     ) -> Any:
+        """
+        Переопределяем стандартный formset,
+        чтобы подставлять значения по умолчанию ещё не созданным сущностям.
+
+        :param request: HttpRequest.
+        :param obj: Optional[Product].
+        :param kwargs: Any.
+        :return: Any.
+        """
         formset = super().get_formset(request, obj, **kwargs)
         formset.obj = obj
         return formset
