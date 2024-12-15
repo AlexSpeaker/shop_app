@@ -3,6 +3,18 @@ from django.utils.translation import gettext_lazy as _
 from product_app.models.product import Product
 
 
+def product_image_directory_path(instance: "ProductImage", filename: str) -> str:
+    """
+    Генератор относительного пути для сохранения файла изображения для модели ProductImage.
+    :param instance: Экземпляр ProductImage.
+    :param filename: Название файла.
+    :return: Относительный путь к файлу.
+    """
+    return "products/{product_id}/images/{filename}".format(
+        product_id=instance.product.pk, filename=filename
+    )
+
+
 class ProductImage(models.Model):
     """
     Модель изображения продукта.
@@ -13,7 +25,9 @@ class ProductImage(models.Model):
     """
 
     title = models.CharField(_("title"), max_length=500, null=False, blank=False)
-    image = models.ImageField(_("image"), null=False, blank=False)
+    image = models.ImageField(
+        _("image"), null=False, blank=False, upload_to=product_image_directory_path
+    )
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="images"
     )

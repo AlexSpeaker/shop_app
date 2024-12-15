@@ -3,7 +3,6 @@ from random import choices
 from string import ascii_letters
 from typing import Dict
 
-from auth_app.models import Profile
 from django.contrib.auth.models import User
 
 

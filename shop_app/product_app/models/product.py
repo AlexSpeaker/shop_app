@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from product_app.models.subcategory import SubCategory
@@ -17,16 +18,29 @@ class Product(models.Model):
     **description** - Короткое описание продукта. \n
     **full_description** - Полное описание продукта. \n
     **free_delivery** - Есть ли бесплатная доставка. \n
-    **tags** - Теги продукта.
+    **tags** - Теги продукта.  \n
+    **archived** - Является ли продукт архивированным.
     """
 
     category = models.ForeignKey(
         SubCategory, on_delete=models.PROTECT, related_name="products"
     )
     price = models.DecimalField(
-        _("price"), max_digits=10, decimal_places=2, null=True, blank=False
+        _("price"),
+        max_digits=10,
+        decimal_places=2,
+        null=False,
+        blank=False,
+        validators=[MinValueValidator(1)],
     )
-    count = models.IntegerField(_("count"), default=0, null=False, blank=False)
+
+    count = models.IntegerField(
+        _("count"),
+        default=0,
+        null=False,
+        blank=False,
+        validators=[MinValueValidator(0)],
+    )
     created_at = models.DateTimeField(
         _("created at"), auto_now_add=True, null=False, blank=False
     )
@@ -42,6 +56,9 @@ class Product(models.Model):
         _("free delivery"), default=False, null=False, blank=False
     )
     tags = models.ManyToManyField(Tag, verbose_name=_("tags"), related_name="products")
+    archived = models.BooleanField(
+        _("archived"), default=False, null=False, blank=False
+    )
 
     def __str__(self) -> str:
         """

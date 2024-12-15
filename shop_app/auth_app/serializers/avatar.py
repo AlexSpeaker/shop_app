@@ -1,7 +1,6 @@
-from typing import Any, Dict, Optional
+from typing import Optional
 
 from auth_app.models.profile import Profile
-from auth_app.utils import delete_file
 from django.db.models.fields.files import ImageFieldFile
 from rest_framework import serializers
 

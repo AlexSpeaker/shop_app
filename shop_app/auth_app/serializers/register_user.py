@@ -1,6 +1,5 @@
 from typing import Any, Dict
 
-from auth_app.models.profile import Profile
 from auth_app.utils import PasswordValidator
 from django.contrib.auth.models import User
 from rest_framework import serializers
