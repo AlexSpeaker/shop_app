@@ -1,7 +1,7 @@
 from typing import Any
 
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 
 from .models import Profile
@@ -35,12 +35,27 @@ def save_user_profile(instance: User, **kwargs: Any) -> None:
 
 
 @receiver(pre_delete, sender=User)
-def delete_avatar(instance: User, **kwargs: Any) -> None:
+def delete_avatar_file_with_user_delete(instance: User, **kwargs: Any) -> None:
     """
     Удаляем файл аватарки, при удалении пользователя.
+
     :param instance: Пользователь.
     :param kwargs: Any.
     :return: None.
     """
     if instance.profile and instance.profile.avatar:
         delete_file(instance.profile.avatar.path)
+
+@receiver(pre_save, sender=Profile)
+def delete_avatar_file_with_save_profile(instance: Profile, **kwargs: Any) -> None:
+    """
+    Удаляем файл аватарки, при сохранении профиля, если аватарка была изменена.
+
+    :param instance: Профиль пользователя.
+    :param kwargs: Any.
+    :return: None.
+    """
+    if instance.pk:
+        old_instance = Profile.objects.get(pk=instance.pk)
+        if old_instance.avatar and old_instance.avatar != instance.avatar:
+            delete_file(old_instance.avatar.path)

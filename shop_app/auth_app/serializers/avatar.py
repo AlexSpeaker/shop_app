@@ -37,11 +37,3 @@ class InAvatarSerializer(serializers.ModelSerializer[Profile]):
     class Meta:
         model = Profile
         fields = ["avatar"]
-
-    def update(self, instance: Profile, validated_data: Dict[str, Any]) -> Any:
-        """Функция удалит старый файл."""
-
-        old_avatar = instance.avatar
-        if old_avatar:
-            delete_file(old_avatar.path)
-        return super().update(instance=instance, validated_data=validated_data)

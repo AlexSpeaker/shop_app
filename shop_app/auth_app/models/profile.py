@@ -94,20 +94,6 @@ class Profile(models.Model):
                 "",
             )
 
-    def delete(self, *args: Any, **kwargs: Any) -> Any:
-        """Подчищаем за собой при удалении профиля."""
-        if self.avatar:
-            delete_file(self.avatar.path)
-        return super().delete(*args, **kwargs)
-
-    def save(self, *args: Any, **kwargs: Any) -> Any:
-        """Подчищаем за собой при сохранении профиля."""
-        if self.pk:
-            old_instance = Profile.objects.get(pk=self.pk)
-            if old_instance.avatar and old_instance.avatar != self.avatar:
-                delete_file(old_instance.avatar.path)
-        return super().save(*args, **kwargs)
-
     def __str__(self) -> str:
         """
         Строковое представление.
