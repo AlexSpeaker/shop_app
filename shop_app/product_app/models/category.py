@@ -28,3 +28,12 @@ class Category(models.Model):
         :return: Category(Имя).
         """
         return f"Category({self.name})"
+
+    class Meta:
+        """
+        Метаданные.
+        """
+
+        verbose_name = _("category")
+        verbose_name_plural = _("categories")
+        ordering = ("name",)

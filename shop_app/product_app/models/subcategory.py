@@ -14,7 +14,9 @@ class SubCategory(models.Model):
     name = models.CharField(
         _("name"), max_length=100, unique=True, null=False, blank=False
     )
-    category = models.ForeignKey(Category, on_delete=models.PROTECT)
+    category = models.ForeignKey(
+        Category, on_delete=models.PROTECT, related_name="subcategories"
+    )
 
     def __str__(self) -> str:
         """
@@ -31,3 +33,12 @@ class SubCategory(models.Model):
         :return: SubCategory(Имя).
         """
         return f"SubCategory({self.name})"
+
+    class Meta:
+        """
+        Метаданные.
+        """
+
+        verbose_name = _("subcategory")
+        verbose_name_plural = _("subcategories")
+        ordering = ("name",)

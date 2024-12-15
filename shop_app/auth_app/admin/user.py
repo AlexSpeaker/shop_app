@@ -50,7 +50,14 @@ class CustomUserAdmin(ModelAdmin):
         "pk",
         "username",
     )
-
+    search_fields = (
+        "username",
+        "profile__name",
+        "profile__surname",
+        "profile__patronymic",
+        "profile__email",
+        "profile__phone",
+    )
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (
