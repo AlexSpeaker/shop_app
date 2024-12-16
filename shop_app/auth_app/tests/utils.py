@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from random import choices
 from string import ascii_letters
 from typing import Dict
@@ -35,3 +36,15 @@ def get_user_with_profile() -> User:
     user.profile.phone = "1".join(choices("0123456789", k=9))
     user.save()
     return user
+
+
+def count_files_in_directory(path: str) -> int:
+    """
+    Функция возвращает количество файлов в указанной директории.
+    :param path: Путь к директории.
+    :return: Количество файлов.
+    """
+    path_obj = Path(path)
+    if not path_obj.exists():
+        return 0
+    return sum(1 for item in path_obj.iterdir() if item.is_file())
