@@ -6,14 +6,14 @@ from string import ascii_letters
 from auth_app.tests.utils import count_files_in_directory
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
-from product_app.models import Category
+from product_app.models import Category, SubCategory
 
 from shop_app import settings
 
 
-class OneCategoryOneImageFileTests(TestCase):
+class OneSubCategoryOneImageFileTests(TestCase):
     """
-    Тест для сигналов модели Category.
+    Тест для сигналов модели SubCategory.
     """
 
     __files_for_test_dir = Path(__file__).parent.parent.parent / "files_for_test"
@@ -33,6 +33,7 @@ class OneCategoryOneImageFileTests(TestCase):
                 content=valid_file.read(),
                 content_type="image/png",
             )
+        cls.category = Category.objects.create(name="".join(choices(ascii_letters, k=6)))
 
     def setUp(self) -> None:
         """
@@ -40,29 +41,30 @@ class OneCategoryOneImageFileTests(TestCase):
 
         :return: None.
         """
-        self.category = Category.objects.create(
-            name="".join(choices(ascii_letters, k=6))
+        self.subcategory = SubCategory.objects.create(
+            name="".join(choices(ascii_letters, k=6)),
+            category=self.category
         )
 
         self.image_file_root = os.path.join(
-            settings.MEDIA_ROOT, "categories", str(self.category.pk), "images"
+            settings.MEDIA_ROOT, "subcategories", str(self.subcategory.pk), "images"
         )
         # Может случиться, что тестовый объект может использовать ту же папку, что и реальный,
         # по этому заранее это посчитаем.
         self.count_exist_user_files = count_files_in_directory(self.image_file_root)
 
-        self.category.image = self.image_file
-        self.category.save()
+        self.subcategory.image = self.image_file
+        self.subcategory.save()
 
     def test_update_image(self) -> None:
         """
-        Обновим картинку у категории. Ожидаем в папке 1 файл.
+        Обновим картинку у подкатегории. Ожидаем в папке 1 файл.
 
         :return: None.
         """
 
-        self.category.image = self.image_file
-        self.category.save()
+        self.subcategory.image = self.image_file
+        self.subcategory.save()
         self.assertEqual(
             count_files_in_directory(self.image_file_root),
             1 + self.count_exist_user_files,
@@ -70,7 +72,7 @@ class OneCategoryOneImageFileTests(TestCase):
 
     def test_delete_image(self) -> None:
         """
-        Удалим картинку у категории.
+        Удалим картинку у подкатегории.
 
         :return: None.
         """
@@ -80,17 +82,17 @@ class OneCategoryOneImageFileTests(TestCase):
             1 + self.count_exist_user_files,
         )
 
-        self.category.image = None
-        self.category.save()
+        self.subcategory.image = None
+        self.subcategory.save()
 
         self.assertEqual(
             count_files_in_directory(self.image_file_root),
             self.count_exist_user_files,
         )
 
-    def test_delete_category(self) -> None:
+    def test_delete_subcategory(self) -> None:
         """
-        Удалим категорию.
+        Удалим подкатегорию.
 
         :return: None.
         """
@@ -100,7 +102,7 @@ class OneCategoryOneImageFileTests(TestCase):
             1 + self.count_exist_user_files,
         )
 
-        self.category.delete()
+        self.subcategory.delete()
 
         self.assertEqual(
             count_files_in_directory(self.image_file_root),
@@ -113,8 +115,8 @@ class OneCategoryOneImageFileTests(TestCase):
 
         :return:
         """
-        if self.category.pk:
-            self.category.delete()
+        if self.subcategory.pk:
+            self.subcategory.delete()
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -123,4 +125,5 @@ class OneCategoryOneImageFileTests(TestCase):
 
         :return: None.
         """
+        cls.category.delete()
         super().tearDownClass()
