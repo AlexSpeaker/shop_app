@@ -6,14 +6,14 @@ from string import ascii_letters
 from auth_app.tests.utils import count_files_in_directory
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
-from product_app.models import Category, SubCategory
+from product_app.models import Category, Product, ProductImage, SubCategory
 
 from shop_app import settings
 
 
-class OneSubCategoryOneImageFileTests(TestCase):
+class OneProductImageOneImageFileTests(TestCase):
     """
-    Тест для сигналов модели SubCategory.
+    Тест для сигналов модели ProductImage.
     """
 
     __files_for_test_dir = Path(__file__).parent.parent.parent / "files_for_test"
@@ -33,8 +33,16 @@ class OneSubCategoryOneImageFileTests(TestCase):
                 content=valid_file.read(),
                 content_type="image/png",
             )
-        cls.category = Category.objects.create(
-            name="".join(choices(ascii_letters, k=6))
+        category = Category.objects.create(name="".join(choices(ascii_letters, k=6)))
+        subcategory = SubCategory.objects.create(
+            name="".join(choices(ascii_letters, k=6)), category=category
+        )
+        cls.product = Product.objects.create(
+            title="".join(choices(ascii_letters, k=6)),
+            category=subcategory,
+            price=100,
+            count=100,
+            description="".join(choices(ascii_letters, k=16)),
         )
 
     def setUp(self) -> None:
@@ -43,29 +51,33 @@ class OneSubCategoryOneImageFileTests(TestCase):
 
         :return: None.
         """
-        self.subcategory = SubCategory.objects.create(
-            name="".join(choices(ascii_letters, k=6)), category=self.category
+        self.product_image = ProductImage.objects.create(
+            title="".join(choices(ascii_letters, k=6)),
+            product=self.product,
         )
 
         self.image_file_root = os.path.join(
-            settings.MEDIA_ROOT, "subcategories", str(self.subcategory.pk), "images"
+            settings.MEDIA_ROOT,
+            "product_image",
+            str(self.product.pk),
+            str(self.product_image.pk),
         )
         # Может случиться, что тестовый объект может использовать ту же папку, что и реальный,
         # по этому заранее это посчитаем.
         self.count_exist_user_files = count_files_in_directory(self.image_file_root)
 
-        self.subcategory.image = self.image_file
-        self.subcategory.save()
+        self.product_image.image = self.image_file
+        self.product_image.save()
 
     def test_update_image(self) -> None:
         """
-        Обновим картинку у подкатегории. Ожидаем в папке 1 файл.
+        Обновим картинку у ProductImage. Ожидаем в папке 1 файл.
 
         :return: None.
         """
 
-        self.subcategory.image = self.image_file
-        self.subcategory.save()
+        self.product_image.image = self.image_file
+        self.product_image.save()
         self.assertEqual(
             count_files_in_directory(self.image_file_root),
             1 + self.count_exist_user_files,
@@ -73,7 +85,7 @@ class OneSubCategoryOneImageFileTests(TestCase):
 
     def test_delete_image(self) -> None:
         """
-        Удалим картинку у подкатегории.
+        Удалим картинку у ProductImage.
 
         :return: None.
         """
@@ -83,17 +95,17 @@ class OneSubCategoryOneImageFileTests(TestCase):
             1 + self.count_exist_user_files,
         )
 
-        self.subcategory.image = None
-        self.subcategory.save()
+        self.product_image.image = None
+        self.product_image.save()
 
         self.assertEqual(
             count_files_in_directory(self.image_file_root),
             self.count_exist_user_files,
         )
 
-    def test_delete_subcategory(self) -> None:
+    def test_delete_product_image_obj(self) -> None:
         """
-        Удалим подкатегорию.
+        Удалим ProductImage.
 
         :return: None.
         """
@@ -103,7 +115,7 @@ class OneSubCategoryOneImageFileTests(TestCase):
             1 + self.count_exist_user_files,
         )
 
-        self.subcategory.delete()
+        self.product_image.delete()
 
         self.assertEqual(
             count_files_in_directory(self.image_file_root),
@@ -116,8 +128,8 @@ class OneSubCategoryOneImageFileTests(TestCase):
 
         :return:
         """
-        if self.subcategory.pk:
-            self.subcategory.delete()
+        if self.product_image.pk:
+            self.product_image.delete()
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -126,5 +138,5 @@ class OneSubCategoryOneImageFileTests(TestCase):
 
         :return: None.
         """
-        cls.category.delete()
+        cls.product.delete()
         super().tearDownClass()

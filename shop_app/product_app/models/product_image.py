@@ -1,3 +1,5 @@
+import os
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from product_app.models.product import Product
@@ -10,8 +12,8 @@ def product_image_directory_path(instance: "ProductImage", filename: str) -> str
     :param filename: Название файла.
     :return: Относительный путь к файлу.
     """
-    return "products/{product_id}/images/{filename}".format(
-        product_id=instance.product.pk, filename=filename
+    return os.path.join(
+        "product_image", str(instance.product.pk), str(instance.pk), filename
     )
 
 

@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -10,9 +12,7 @@ def avatar_directory_path(instance: "Profile", filename: str) -> str:
     :param filename: Название файла.
     :return: Относительный путь к файлу.
     """
-    return "profile/{user_id}/avatar/{filename}".format(
-        user_id=instance.user.pk, filename=filename
-    )
+    return os.path.join("profile", str(instance.pk), "avatar", filename)
 
 
 class Profile(models.Model):

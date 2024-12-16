@@ -1,3 +1,5 @@
+import os
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -9,9 +11,7 @@ def category_image_directory_path(instance: "Category", filename: str) -> str:
     :param filename: Название файла.
     :return: Относительный путь к файлу.
     """
-    return "categories/{category_id}/images/{filename}".format(
-        category_id=instance.pk, filename=filename
-    )
+    return os.path.join("categories", str(instance.pk), "images", filename)
 
 
 class Category(models.Model):
