@@ -3,9 +3,9 @@ from typing import Any
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
+from utils import delete_file
 
 from .models import Profile
-from .utils import delete_file
 
 
 @receiver(post_save, sender=User)

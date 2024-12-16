@@ -1,8 +1,8 @@
 from auth_app.models.profile import Profile
 from auth_app.serializers.avatar import OutAvatarSerializer
-from auth_app.utils import PhoneValidator
 from django.core.validators import EmailValidator
 from rest_framework import serializers
+from utils import PhoneValidator
 
 
 class ProfileSerializer(serializers.ModelSerializer[Profile]):

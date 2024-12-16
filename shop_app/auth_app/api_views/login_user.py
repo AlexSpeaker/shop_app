@@ -1,11 +1,11 @@
 from auth_app.serializers.login_user import LoginUserSerializer
-from auth_app.utils import get_user_data
 from django.contrib.auth import authenticate, login
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from utils import get_user_data
 
 
 class UserLoginAPIView(APIView):

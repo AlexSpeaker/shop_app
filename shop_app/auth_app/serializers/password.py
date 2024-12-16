@@ -1,8 +1,8 @@
 from typing import Any, Dict
 
-from auth_app.utils import PasswordValidator
 from django.contrib.auth.base_user import AbstractBaseUser
 from rest_framework import serializers
+from utils import PasswordValidator
 
 
 class ChangePasswordSerializer(serializers.Serializer[AbstractBaseUser]):

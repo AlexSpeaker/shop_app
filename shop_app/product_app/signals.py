@@ -1,9 +1,9 @@
 from typing import Any
 
-from auth_app.utils import delete_file
 from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
 from product_app.models import ProductImage
+from utils import delete_file
 
 
 @receiver(pre_delete, sender=ProductImage)
@@ -35,4 +35,3 @@ def delete_image_file_when_saving_model_product_image(
         old_instance = ProductImage.objects.get(pk=instance.pk)
         if old_instance.image != instance.image:
             delete_file(old_instance.image.path)
-

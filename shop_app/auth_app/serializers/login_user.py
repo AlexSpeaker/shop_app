@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
-from auth_app.utils import PasswordValidator
 from rest_framework import serializers
+from utils import PasswordValidator
 
 
 class LoginUserSerializer(serializers.Serializer[Dict[str, Any]]):
