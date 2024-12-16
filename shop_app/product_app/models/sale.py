@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -46,21 +48,13 @@ class Sale(models.Model):
         """
         super().clean()
         if not self.date_from:
-            raise ValidationError(
-                {"date_from": "Это обязательное поле."}
-            )
+            raise ValidationError({"date_from": "Это обязательное поле."})
         if not self.date_to:
-            raise ValidationError(
-                {"date_to": "Это обязательное поле."}
-            )
+            raise ValidationError({"date_to": "Это обязательное поле."})
         if not self.price:
-            raise ValidationError(
-                {"price": "Это обязательное поле."}
-            )
+            raise ValidationError({"price": "Это обязательное поле."})
         if not self.sale_price:
-            raise ValidationError(
-                {"sale_price": "Это обязательное поле."}
-            )
+            raise ValidationError({"sale_price": "Это обязательное поле."})
         if self.date_from >= self.date_to:
             raise ValidationError(
                 {"date_to": "Конечная дата должна быть больше стартовой."}
@@ -71,6 +65,14 @@ class Sale(models.Model):
                     "sale_price": "Цена со скидкой должна быть меньше мнимой цены без скидки."
                 }
             )
+        if not self.pk:
+            sales = Sale.objects.filter(date_to__gte=date.today()).count()
+            if sales:
+                raise ValidationError(
+                    {
+                        "date_to": "Распродажа уже идёт, завершите (удалите) старую, что бы начать новую."
+                    }
+                )
 
     class Meta:
         verbose_name = _("sale")

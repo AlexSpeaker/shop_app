@@ -31,6 +31,7 @@ class CustomInlineFormSet(BaseInlineFormSet):
     """
     Переопределяем класс BaseInlineFormSet.
     """
+
     forms: Any
     obj: Optional[Product] = None
 
@@ -49,7 +50,6 @@ class CustomInlineFormSet(BaseInlineFormSet):
                 if not _form.instance.pk:
                     _form.initial["price"] = self.obj.price
                     _form.initial["date_from"] = date.today()
-
 
 
 class ProductImageInline(ImageTabularInline):
@@ -80,10 +80,10 @@ class ProductSaleInline(SaleTabularInline):
 
     model = Sale
     verbose_name_plural = _("Sales")
-    extra = 1
+    extra = 0
     formset = CustomInlineFormSet
-    fields = ('created_at', 'date_from', 'date_to', 'price', 'sale_price', 'relevant')
-    readonly_fields = ('created_at', 'relevant')
+    fields = ("created_at", "date_from", "date_to", "price", "sale_price", "relevant")
+    readonly_fields = ("created_at", "relevant")
 
     @staticmethod
     def relevant(obj: Sale) -> SafeString:
