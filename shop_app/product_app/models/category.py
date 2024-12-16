@@ -25,7 +25,7 @@ class Category(models.Model):
         _("name"), max_length=100, unique=True, null=False, blank=False
     )
     image = models.ImageField(
-        _("image"), null=False, blank=False, upload_to=category_image_directory_path
+        _("image"), null=True, blank=False, upload_to=category_image_directory_path
     )
 
     def __str__(self) -> str:

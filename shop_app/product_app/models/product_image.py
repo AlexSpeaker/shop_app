@@ -26,7 +26,7 @@ class ProductImage(models.Model):
 
     title = models.CharField(_("title"), max_length=500, null=False, blank=False)
     image = models.ImageField(
-        _("image"), null=False, blank=False, upload_to=product_image_directory_path
+        _("image"), null=True, blank=False, upload_to=product_image_directory_path
     )
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="images"

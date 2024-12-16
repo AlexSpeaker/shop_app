@@ -17,7 +17,8 @@ def delete_image_file_when_deleting_model_product_image(
     :param kwargs: Any.
     :return: None.
     """
-    delete_file(instance.image.path)
+    if instance.image:
+        delete_file(instance.image.path)
 
 
 @receiver(pre_save, sender=ProductImage)
@@ -33,7 +34,7 @@ def delete_image_file_when_saving_model_product_image(
     """
     if instance.pk:
         old_instance = ProductImage.objects.get(pk=instance.pk)
-        if old_instance.image != instance.image:
+        if old_instance.image and old_instance.image != instance.image:
             delete_file(old_instance.image.path)
 
 
@@ -48,7 +49,8 @@ def delete_image_file_when_deleting_model_category(
     :param kwargs: Any.
     :return: None.
     """
-    delete_file(instance.image.path)
+    if instance.image:
+        delete_file(instance.image.path)
 
 
 @receiver(pre_save, sender=Category)
@@ -64,7 +66,7 @@ def delete_image_file_when_saving_model_category(
     """
     if instance.pk:
         old_instance = Category.objects.get(pk=instance.pk)
-        if old_instance.image != instance.image:
+        if old_instance.image and old_instance.image != instance.image:
             delete_file(old_instance.image.path)
 
 
@@ -79,7 +81,8 @@ def delete_image_file_when_deleting_model_subcategory(
     :param kwargs: Any.
     :return: None.
     """
-    delete_file(instance.image.path)
+    if instance.image:
+        delete_file(instance.image.path)
 
 
 @receiver(pre_save, sender=SubCategory)
@@ -95,5 +98,5 @@ def delete_image_file_when_saving_model_subcategory(
     """
     if instance.pk:
         old_instance = SubCategory.objects.get(pk=instance.pk)
-        if old_instance.image != instance.image:
+        if old_instance.image and old_instance.image != instance.image:
             delete_file(old_instance.image.path)

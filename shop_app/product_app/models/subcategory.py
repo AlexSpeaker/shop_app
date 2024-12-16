@@ -27,7 +27,7 @@ class SubCategory(models.Model):
         _("name"), max_length=100, unique=True, null=False, blank=False
     )
     image = models.ImageField(
-        _("image"), upload_to=subcategory_image_directory_path, null=False, blank=False
+        _("image"), upload_to=subcategory_image_directory_path, null=True, blank=False
     )
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, related_name="subcategories"

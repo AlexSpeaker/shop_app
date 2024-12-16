@@ -22,7 +22,7 @@ class OneProfileOneAvatarImageFileTests(TestCase):
         """
         Подготовка к тестам.
 
-        :return:
+        :return: None.
         """
         super().setUpClass()
         with open(cls.__valid_file_path, "rb") as valid_file:
