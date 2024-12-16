@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+
 def category_image_directory_path(instance: "Category", filename: str) -> str:
     """
     Генератор относительного пути для сохранения файла изображения для модели Category.
@@ -12,6 +13,7 @@ def category_image_directory_path(instance: "Category", filename: str) -> str:
         category_id=instance.pk, filename=filename
     )
 
+
 class Category(models.Model):
     """
     Модель категории.
@@ -22,7 +24,9 @@ class Category(models.Model):
     name = models.CharField(
         _("name"), max_length=100, unique=True, null=False, blank=False
     )
-    image = models.ImageField(_("image"), null=False, blank=False, upload_to=category_image_directory_path)
+    image = models.ImageField(
+        _("image"), null=False, blank=False, upload_to=category_image_directory_path
+    )
 
     def __str__(self) -> str:
         """
