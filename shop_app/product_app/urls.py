@@ -1,5 +1,8 @@
 from django.urls import path
+from product_app.api_views.catalog.categories import CategoryListView
 
 app_name = "product_app"
 
-urlpatterns = []
+urlpatterns = [
+    path("categories", CategoryListView.as_view(), name="categories"),
+]

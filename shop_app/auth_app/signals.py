@@ -3,7 +3,7 @@ from typing import Any
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
-from utils import delete_file
+from utils import delete_file, save_obj_with_image
 
 from .models import Profile
 
@@ -60,3 +60,16 @@ def delete_avatar_file_with_save_profile(instance: Profile, **kwargs: Any) -> No
         old_instance = Profile.objects.get(pk=instance.pk)
         if old_instance.avatar and old_instance.avatar != instance.avatar:
             delete_file(old_instance.avatar.path)
+
+@receiver(pre_save, sender=Profile)
+def get_id_profile_for_image_file(instance: Profile, **kwargs: Any) -> None:
+    """
+    Если при создании профиля уже содержится изображение,
+    то функция предварительно получит id профиля, необходимое для получения директории хранения изображения.
+
+    :param instance: Profile.
+    :param kwargs: Any.
+    :return: None.
+    """
+    if not instance.pk and instance.avatar:
+        save_obj_with_image(instance, "avatar")

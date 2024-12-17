@@ -1,7 +1,7 @@
 import json
 import os
 from json import JSONDecodeError
-from typing import Any, Dict
+from typing import Any, Dict, TypeVar
 
 from django.core.validators import RegexValidator
 from rest_framework.exceptions import ValidationError
@@ -71,3 +71,23 @@ class PasswordValidator:
         # Проверка длины пароля
         if len(value) < self.min_length or len(value) > self.max_length:
             raise ValidationError(self.message)
+
+
+T = TypeVar("T")
+
+
+def save_obj_with_image(instance: T, attr: str) -> T:
+    """
+    Функция предварительно сохранит объект, а потом добавит в него изображение,
+    так как для создания директории нужен id объекта.
+
+    :param instance: Объект перед созданием.
+    :param attr: Атрибут с изображением.
+    :return: Созданный объект.
+    """
+    image = getattr(instance, attr)
+    setattr(instance, attr, None)
+    instance.save()
+    setattr(instance, attr, image)
+    instance.save()
+    return instance
