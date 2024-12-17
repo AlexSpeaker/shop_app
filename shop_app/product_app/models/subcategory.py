@@ -1,4 +1,5 @@
 import os
+import uuid
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -12,7 +13,7 @@ def subcategory_image_directory_path(instance: "SubCategory", filename: str) -> 
     :param filename: Название файла.
     :return: Относительный путь к файлу.
     """
-    return os.path.join("subcategories", instance.name, "images", filename)
+    return os.path.join("subcategories", str(instance.unique_id), "images", filename)
 
 
 class SubCategory(models.Model):
@@ -23,6 +24,7 @@ class SubCategory(models.Model):
     **category** - Категория.
     """
 
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(
         _("name"), max_length=100, unique=True, null=False, blank=False
     )

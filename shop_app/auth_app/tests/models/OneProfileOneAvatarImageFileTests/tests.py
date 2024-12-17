@@ -41,7 +41,7 @@ class OneProfileOneAvatarImageFileTests(TestCase):
 
         self.user = get_user_with_profile()
         self.image_file_root = os.path.join(
-            settings.MEDIA_ROOT, "profile", self.user.username, "avatar"
+            settings.MEDIA_ROOT, "profile", str(self.user.profile.unique_id), "avatar"
         )
         self.user.profile.avatar = self.image_file
         self.user.profile.save()
@@ -91,7 +91,9 @@ class OneProfileOneAvatarImageFileTests(TestCase):
         """
         users = [get_user_with_profile() for _ in range(5)]
         image_file_roots = [
-            os.path.join(settings.MEDIA_ROOT, "profile", user.username, "avatar")
+            os.path.join(
+                settings.MEDIA_ROOT, "profile", str(user.profile.unique_id), "avatar"
+            )
             for user in users
         ]
 

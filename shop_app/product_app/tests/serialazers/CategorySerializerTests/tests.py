@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from random import choices
 from string import ascii_letters
@@ -27,9 +28,10 @@ class CategorySerializerTests(TestCase):
 
         super().setUpClass()
         cls.count_subcategory = 3
+        cls.file_name = "test_image.png"
         with open(cls.__valid_file_path, "rb") as valid_file:
             image_file = SimpleUploadedFile(
-                name="test_image.png",
+                name=cls.file_name,
                 content=valid_file.read(),
                 content_type="image/png",
             )
@@ -58,9 +60,21 @@ class CategorySerializerTests(TestCase):
         data = serializer.data
         self.assertEqual({"id", "title", "image", "subcategories"}, set(data.keys()))
         self.assertEqual({"src", "alt"}, set(data["image"].keys()))
+        self.assertTrue(
+            data["image"]["src"].endswith(
+                str(
+                    os.path.join(str(self.category.unique_id), "images", self.file_name)
+                )
+            )
+        )
         self.assertEqual(len(data["subcategories"]), self.count_subcategory)
         self.assertEqual({"id", "title", "image"}, set(data["subcategories"][0].keys()))
         self.assertEqual({"src", "alt"}, set(data["subcategories"][0]["image"].keys()))
+        self.assertTrue(
+            data["subcategories"][0]["image"]["src"].endswith(
+                str(os.path.join("images", self.file_name))
+            )
+        )
 
     @classmethod
     def tearDownClass(cls) -> None:

@@ -45,7 +45,7 @@ class OneCategoryOneImageFileTests(TestCase):
         )
 
         self.image_file_root = os.path.join(
-            settings.MEDIA_ROOT, "categories", self.category.name, "images"
+            settings.MEDIA_ROOT, "categories", str(self.category.unique_id), "images"
         )
 
     def test_update_image(self) -> None:

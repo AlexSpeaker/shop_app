@@ -1,4 +1,5 @@
 import os
+import uuid
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -12,7 +13,7 @@ def avatar_directory_path(instance: "Profile", filename: str) -> str:
     :param filename: Название файла.
     :return: Относительный путь к файлу.
     """
-    return os.path.join("profile", instance.user.username, "avatar", filename)
+    return os.path.join("profile", str(instance.unique_id), "avatar", filename)
 
 
 class Profile(models.Model):
@@ -28,6 +29,7 @@ class Profile(models.Model):
     **avatar** - Аватарка пользователя.
     """
 
+    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     name = models.CharField(
         _("name"), max_length=50, blank=True, null=False, default=""

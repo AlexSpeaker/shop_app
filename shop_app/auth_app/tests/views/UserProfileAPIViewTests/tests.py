@@ -94,7 +94,11 @@ class UserProfileAPIViewTests(APITestCase):
         self.assertEqual(response.data["phone"], self.user.profile.phone)
         self.assertTrue(
             response.data["avatar"]["src"].endswith(
-                str(os.path.join(self.user.username, "avatar", self.file_name))
+                str(
+                    os.path.join(
+                        str(self.user.profile.unique_id), "avatar", self.file_name
+                    )
+                )
             )
         )
 

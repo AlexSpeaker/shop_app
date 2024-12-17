@@ -50,7 +50,10 @@ class OneSubCategoryOneImageFileTests(TestCase):
         )
 
         self.image_file_root = os.path.join(
-            settings.MEDIA_ROOT, "subcategories", self.subcategory.name, "images"
+            settings.MEDIA_ROOT,
+            "subcategories",
+            str(self.subcategory.unique_id),
+            "images",
         )
 
     def test_update_image(self) -> None:
