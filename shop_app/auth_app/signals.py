@@ -61,6 +61,7 @@ def delete_avatar_file_with_save_profile(instance: Profile, **kwargs: Any) -> No
         if old_instance.avatar and old_instance.avatar != instance.avatar:
             delete_file(old_instance.avatar.path)
 
+
 @receiver(pre_save, sender=Profile)
 def get_id_profile_for_image_file(instance: Profile, **kwargs: Any) -> None:
     """
