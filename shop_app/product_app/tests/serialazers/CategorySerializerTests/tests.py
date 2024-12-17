@@ -56,9 +56,11 @@ class CategorySerializerTests(TestCase):
         """
         serializer = self.category_serializer(instance=self.category)
         data = serializer.data
-        self.assertEqual({'id', 'title', 'image', 'subcategories'}, set(data.keys()))
-        self.assertEqual(len(data['subcategories']), self.count_subcategory)
-        self.assertEqual({'id', 'title', 'image'}, set(data['subcategories'][0].keys()))
+        self.assertEqual({"id", "title", "image", "subcategories"}, set(data.keys()))
+        self.assertEqual({"src", "alt"}, set(data["image"].keys()))
+        self.assertEqual(len(data["subcategories"]), self.count_subcategory)
+        self.assertEqual({"id", "title", "image"}, set(data["subcategories"][0].keys()))
+        self.assertEqual({"src", "alt"}, set(data["subcategories"][0]["image"].keys()))
 
     @classmethod
     def tearDownClass(cls) -> None:

@@ -30,7 +30,7 @@ def get_user_with_profile() -> User:
         username="".join(choices(ascii_letters, k=6)),
         password="".join(choices(ascii_letters, k=6)),
     )
-    profile = Profile.objects.create(
+    Profile.objects.create(
         user=user,
         name="E".join(choices(ascii_letters, k=6)),
         surname="E".join(choices(ascii_letters, k=6)),
