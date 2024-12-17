@@ -3,11 +3,11 @@ from string import ascii_letters
 
 from auth_app.serializers.password import ChangePasswordSerializer
 from django.contrib.auth.models import User
+from django.test import TestCase
 from rest_framework.exceptions import ValidationError
-from rest_framework.test import APITestCase
 
 
-class ChangePasswordSerializerTests(APITestCase):
+class ChangePasswordSerializerTests(TestCase):
     """
     Класс Тест для сериализатора ChangePasswordSerializer.
     """

@@ -4,11 +4,11 @@ from typing import Dict
 
 from auth_app.serializers.register_user import RegisterUserSerializer
 from django.contrib.auth.models import User
+from django.test import TestCase
 from rest_framework.exceptions import ValidationError
-from rest_framework.test import APITestCase
 
 
-class RegisterUserSerializerTests(APITestCase):
+class RegisterUserSerializerTests(TestCase):
     """
     Класс Тест для сериализатора RegisterUserSerializer.
     """

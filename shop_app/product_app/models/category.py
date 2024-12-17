@@ -11,7 +11,8 @@ def category_image_directory_path(instance: "Category", filename: str) -> str:
     :param filename: Название файла.
     :return: Относительный путь к файлу.
     """
-    return os.path.join("categories", str(instance.pk), "images", filename)
+
+    return os.path.join("categories", instance.name, "images", filename)
 
 
 class Category(models.Model):

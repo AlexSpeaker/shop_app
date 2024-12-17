@@ -2,11 +2,11 @@ from pathlib import Path
 
 from auth_app.serializers.avatar import InAvatarSerializer
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase
 from rest_framework.exceptions import ValidationError
-from rest_framework.test import APITestCase
 
 
-class InAvatarSerializerTests(APITestCase):
+class InAvatarSerializerTests(TestCase):
     """
     Класс Тест для сериализатора InAvatarSerializer.
     """

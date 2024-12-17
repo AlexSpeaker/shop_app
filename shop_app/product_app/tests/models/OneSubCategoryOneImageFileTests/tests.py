@@ -44,18 +44,14 @@ class OneSubCategoryOneImageFileTests(TestCase):
         :return: None.
         """
         self.subcategory = SubCategory.objects.create(
-            name="".join(choices(ascii_letters, k=6)), category=self.category
+            name="".join(choices(ascii_letters, k=6)),
+            category=self.category,
+            image=self.image_file,
         )
 
         self.image_file_root = os.path.join(
-            settings.MEDIA_ROOT, "subcategories", str(self.subcategory.pk), "images"
+            settings.MEDIA_ROOT, "subcategories", self.subcategory.name, "images"
         )
-        # Может случиться, что тестовый объект может использовать ту же папку, что и реальный,
-        # по этому заранее это посчитаем.
-        self.count_exist_user_files = count_files_in_directory(self.image_file_root)
-
-        self.subcategory.image = self.image_file
-        self.subcategory.save()
 
     def test_update_image(self) -> None:
         """
@@ -66,10 +62,7 @@ class OneSubCategoryOneImageFileTests(TestCase):
 
         self.subcategory.image = self.image_file
         self.subcategory.save()
-        self.assertEqual(
-            count_files_in_directory(self.image_file_root),
-            1 + self.count_exist_user_files,
-        )
+        self.assertEqual(count_files_in_directory(self.image_file_root), 1)
 
     def test_delete_image(self) -> None:
         """
@@ -78,18 +71,12 @@ class OneSubCategoryOneImageFileTests(TestCase):
         :return: None.
         """
         # Убедимся, что файл уже есть.
-        self.assertEqual(
-            count_files_in_directory(self.image_file_root),
-            1 + self.count_exist_user_files,
-        )
+        self.assertEqual(count_files_in_directory(self.image_file_root), 1)
 
         self.subcategory.image = None
         self.subcategory.save()
 
-        self.assertEqual(
-            count_files_in_directory(self.image_file_root),
-            self.count_exist_user_files,
-        )
+        self.assertEqual(count_files_in_directory(self.image_file_root), 0)
 
     def test_delete_subcategory(self) -> None:
         """
@@ -98,17 +85,11 @@ class OneSubCategoryOneImageFileTests(TestCase):
         :return: None.
         """
         # Убедимся, что файл есть.
-        self.assertEqual(
-            count_files_in_directory(self.image_file_root),
-            1 + self.count_exist_user_files,
-        )
+        self.assertEqual(count_files_in_directory(self.image_file_root), 1)
 
         self.subcategory.delete()
 
-        self.assertEqual(
-            count_files_in_directory(self.image_file_root),
-            self.count_exist_user_files,
-        )
+        self.assertEqual(count_files_in_directory(self.image_file_root), 0)
 
     def tearDown(self) -> None:
         """

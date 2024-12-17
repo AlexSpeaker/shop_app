@@ -1,5 +1,6 @@
 from typing import Any, Dict
 
+from auth_app.models import Profile
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from utils import PasswordValidator
@@ -48,6 +49,7 @@ class RegisterUserSerializer(serializers.ModelSerializer[User]):
         user = User.objects.create_user(
             username=validated_data["username"], password=validated_data["password"]
         )
-        user.profile.name = validated_data["name"]
+        profile = Profile.objects.create(user=user, name=validated_data["name"])
+        user.profile = profile
         user.save()
         return user

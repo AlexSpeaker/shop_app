@@ -3,7 +3,7 @@ from product_app.serializers.image import OutImageSerializer
 from rest_framework import serializers
 
 
-class SubCategorySerializers(serializers.ModelSerializer[SubCategory]):
+class SubCategorySerializer(serializers.ModelSerializer[SubCategory]):
     """
     Serializer для SubCategory.
     """
@@ -17,7 +17,7 @@ class SubCategorySerializers(serializers.ModelSerializer[SubCategory]):
         fields = "id", "title", "image"
 
 
-class CategorySerializers(serializers.ModelSerializer[Category]):
+class CategorySerializer(serializers.ModelSerializer[Category]):
     """
     Serializer для Category.
     """
@@ -25,7 +25,7 @@ class CategorySerializers(serializers.ModelSerializer[Category]):
     title = serializers.CharField(read_only=True, source="name")
     id = serializers.IntegerField(read_only=True, source="pk")
     image = OutImageSerializer(read_only=True)
-    subcategories = SubCategorySerializers(many=True, read_only=True)
+    subcategories = SubCategorySerializer(many=True, read_only=True)
 
     class Meta:
         model = Category

@@ -12,7 +12,7 @@ def avatar_directory_path(instance: "Profile", filename: str) -> str:
     :param filename: Название файла.
     :return: Относительный путь к файлу.
     """
-    return os.path.join("profile", str(instance.pk), "avatar", filename)
+    return os.path.join("profile", instance.user.username, "avatar", filename)
 
 
 class Profile(models.Model):

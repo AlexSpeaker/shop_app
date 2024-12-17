@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import sys
+import tempfile
 from pathlib import Path
 from typing import List
 
@@ -135,7 +137,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
-MEDIA_ROOT = BASE_DIR / "uploads"
+
+MEDIA_ROOT: Path | str = (
+    tempfile.mkdtemp() if "test" in sys.argv else BASE_DIR / "uploads"
+)
 MEDIA_URL = "/media/"
 
 # Default primary key field type

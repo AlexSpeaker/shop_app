@@ -69,7 +69,6 @@ class RegisterUserAPIViewTests(APITestCase):
 
         new_user: User = User.objects.get(username=self.new_user_data["username"])
         self.assertEqual(self.client.session.get("_auth_user_id"), str(new_user.pk))
-        self.assertTrue(new_user.profile is not None)
         self.assertEqual(new_user.profile.name, self.new_user_data["name"])
 
     def test_register_user_invalid_username_exists_username(self) -> None:

@@ -12,7 +12,7 @@ def subcategory_image_directory_path(instance: "SubCategory", filename: str) -> 
     :param filename: Название файла.
     :return: Относительный путь к файлу.
     """
-    return os.path.join("subcategories", str(instance.pk), "images", filename)
+    return os.path.join("subcategories", instance.name, "images", filename)
 
 
 class SubCategory(models.Model):

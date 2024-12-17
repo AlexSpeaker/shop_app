@@ -54,20 +54,15 @@ class OneProductImageOneImageFileTests(TestCase):
         self.product_image = ProductImage.objects.create(
             title="".join(choices(ascii_letters, k=6)),
             product=self.product,
+            image=self.image_file,
         )
 
         self.image_file_root = os.path.join(
             settings.MEDIA_ROOT,
             "product_image",
             str(self.product.pk),
-            str(self.product_image.pk),
+            "images",
         )
-        # Может случиться, что тестовый объект может использовать ту же папку, что и реальный,
-        # по этому заранее это посчитаем.
-        self.count_exist_user_files = count_files_in_directory(self.image_file_root)
-
-        self.product_image.image = self.image_file
-        self.product_image.save()
 
     def test_update_image(self) -> None:
         """
@@ -78,10 +73,7 @@ class OneProductImageOneImageFileTests(TestCase):
 
         self.product_image.image = self.image_file
         self.product_image.save()
-        self.assertEqual(
-            count_files_in_directory(self.image_file_root),
-            1 + self.count_exist_user_files,
-        )
+        self.assertEqual(count_files_in_directory(self.image_file_root), 1)
 
     def test_delete_image(self) -> None:
         """
@@ -90,18 +82,12 @@ class OneProductImageOneImageFileTests(TestCase):
         :return: None.
         """
         # Убедимся, что файл уже есть.
-        self.assertEqual(
-            count_files_in_directory(self.image_file_root),
-            1 + self.count_exist_user_files,
-        )
+        self.assertEqual(count_files_in_directory(self.image_file_root), 1)
 
         self.product_image.image = None
         self.product_image.save()
 
-        self.assertEqual(
-            count_files_in_directory(self.image_file_root),
-            self.count_exist_user_files,
-        )
+        self.assertEqual(count_files_in_directory(self.image_file_root), 0)
 
     def test_delete_product_image_obj(self) -> None:
         """
@@ -110,17 +96,11 @@ class OneProductImageOneImageFileTests(TestCase):
         :return: None.
         """
         # Убедимся, что файл есть.
-        self.assertEqual(
-            count_files_in_directory(self.image_file_root),
-            1 + self.count_exist_user_files,
-        )
+        self.assertEqual(count_files_in_directory(self.image_file_root), 1)
 
         self.product_image.delete()
 
-        self.assertEqual(
-            count_files_in_directory(self.image_file_root),
-            self.count_exist_user_files,
-        )
+        self.assertEqual(count_files_in_directory(self.image_file_root), 0)
 
     def tearDown(self) -> None:
         """

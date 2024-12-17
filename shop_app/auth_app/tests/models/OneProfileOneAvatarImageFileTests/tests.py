@@ -38,31 +38,23 @@ class OneProfileOneAvatarImageFileTests(TestCase):
 
         :return: None.
         """
+
         self.user = get_user_with_profile()
         self.image_file_root = os.path.join(
-            settings.MEDIA_ROOT, "profile", str(self.user.pk), "avatar"
+            settings.MEDIA_ROOT, "profile", self.user.username, "avatar"
         )
-        # Может случиться, что тестовый пользователь может использовать ту же папку, что и реальный,
-        # по этому заранее это посчитаем.
-        self.count_exist_user_files = count_files_in_directory(self.image_file_root)
-
         self.user.profile.avatar = self.image_file
-        self.user.save()
+        self.user.profile.save()
 
     def test_update_avatar(self) -> None:
         """
         Обновим аватарку у пользователя. Ожидаем в папке 1 файл.
-        (На самом деле их может быть и два,
-        так как тестовый пользователь может пересекаться с существующим, учтём это.)
 
         :return: None.
         """
         self.user.profile.avatar = self.image_file
-        self.user.save()
-        self.assertEqual(
-            count_files_in_directory(self.image_file_root),
-            1 + self.count_exist_user_files,
-        )
+        self.user.profile.save()
+        self.assertEqual(count_files_in_directory(self.image_file_root), 1)
 
     def test_delete_avatar(self) -> None:
         """
@@ -71,18 +63,12 @@ class OneProfileOneAvatarImageFileTests(TestCase):
         :return: None.
         """
         # Убедимся, что файл аватарки уже есть.
-        self.assertEqual(
-            count_files_in_directory(self.image_file_root),
-            1 + self.count_exist_user_files,
-        )
+        self.assertEqual(count_files_in_directory(self.image_file_root), 1)
 
         self.user.profile.avatar = None
-        self.user.save()
+        self.user.profile.save()
 
-        self.assertEqual(
-            count_files_in_directory(self.image_file_root),
-            self.count_exist_user_files,
-        )
+        self.assertEqual(count_files_in_directory(self.image_file_root), 0)
 
     def test_delete_user(self) -> None:
         """
@@ -91,17 +77,11 @@ class OneProfileOneAvatarImageFileTests(TestCase):
         :return: None.
         """
         # Убедимся, что файл аватарки уже есть.
-        self.assertEqual(
-            count_files_in_directory(self.image_file_root),
-            1 + self.count_exist_user_files,
-        )
+        self.assertEqual(count_files_in_directory(self.image_file_root), 1)
 
         self.user.delete()
 
-        self.assertEqual(
-            count_files_in_directory(self.image_file_root),
-            self.count_exist_user_files,
-        )
+        self.assertEqual(count_files_in_directory(self.image_file_root), 0)
 
     def test_delete_many_users(self) -> None:
         """
@@ -111,37 +91,24 @@ class OneProfileOneAvatarImageFileTests(TestCase):
         """
         users = [get_user_with_profile() for _ in range(5)]
         image_file_roots = [
-            os.path.join(settings.MEDIA_ROOT, "profile", str(user.pk), "avatar")
+            os.path.join(settings.MEDIA_ROOT, "profile", user.username, "avatar")
             for user in users
-        ]
-        count_exist_users_files = [
-            count_files_in_directory(root) for root in image_file_roots
         ]
 
         for user in users:
             user.profile.avatar = self.image_file
-            user.save()
+            user.profile.save()
 
         # Убедимся, что файлы есть:
-        for image_file_root, count_exist_user_files in zip(
-            image_file_roots, count_exist_users_files
-        ):
-            self.assertEqual(
-                count_files_in_directory(image_file_root),
-                1 + count_exist_user_files,
-            )
+        for image_file_root in image_file_roots:
+            self.assertEqual(count_files_in_directory(image_file_root), 1)
         # Получаем из БД всех пользователей и удаляем.
         users_in_db = User.objects.all()
         users_in_db.delete()
 
         # Убедимся, что файлы удалены.
-        for image_file_root, count_exist_user_files in zip(
-            image_file_roots, count_exist_users_files
-        ):
-            self.assertEqual(
-                count_files_in_directory(image_file_root),
-                count_exist_user_files,
-            )
+        for image_file_root in image_file_roots:
+            self.assertEqual(count_files_in_directory(image_file_root), 0)
 
     def tearDown(self) -> None:
         """

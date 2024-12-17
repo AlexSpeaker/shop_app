@@ -26,6 +26,7 @@ class ProfileInline(StackedInline):
     model = Profile
     can_delete = False
     verbose_name_plural = _("Profile")
+    fields = "name", "patronymic", "surname", "phone", "email", "avatar"
 
 
 admin.site.unregister(User)
