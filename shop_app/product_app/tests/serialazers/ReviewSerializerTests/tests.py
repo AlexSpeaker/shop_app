@@ -4,8 +4,9 @@ from string import ascii_letters
 from django.db.models import Q
 from django.test import TestCase
 from django.utils.timezone import get_current_timezone, now
-from product_app.models import Category, Product, Review, SubCategory
+from product_app.models import Category, Product, Review, SubCategory, Tag
 from product_app.serializers.review import ReviewSerializer
+from product_app.tests.utils import get_product
 from rest_framework.exceptions import ValidationError
 
 
@@ -24,19 +25,7 @@ class ReviewSerializerTests(TestCase):
         :return: None.
         """
         super().setUpClass()
-        cls.category = Category.objects.create(
-            name="".join(choices(ascii_letters, k=6))
-        )
-        cls.subcategory = SubCategory.objects.create(
-            name="".join(choices(ascii_letters, k=6)), category=cls.category
-        )
-        cls.product = Product.objects.create(
-            category=cls.subcategory,
-            title="".join(choices(ascii_letters, k=6)),
-            price=100,
-            count=100,
-            description="".join(choices(ascii_letters, k=6)),
-        )
+        cls.product = get_product()
         cls.review = Review.objects.create(
             product=cls.product,
             author="".join(choices(ascii_letters, k=6)),
@@ -204,8 +193,8 @@ class ReviewSerializerTests(TestCase):
 
         :return: None.
         """
-        cls.review.delete()
-        cls.product.delete()
-        cls.subcategory.delete()
-        cls.category.delete()
+        Tag.objects.all().delete()
+        Product.objects.all().delete()
+        SubCategory.objects.all().delete()
+        Category.objects.all().delete()
         super().tearDownClass()

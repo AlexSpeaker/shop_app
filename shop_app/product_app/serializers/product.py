@@ -1,6 +1,6 @@
 from datetime import date
 from decimal import Decimal
-from typing import Optional
+from typing import Optional, List
 
 from django.db.models import Avg, Q
 from django.db.models.fields.files import ImageFieldFile
@@ -19,21 +19,19 @@ class OutProductImageSerializer(serializers.ModelSerializer[ProductImage]):
         fields = ("src", "alt")
 
     @staticmethod
-    def get_src(image: Optional[ImageFieldFile]) -> Optional[str]:
+    def get_src(obj: ProductImage) -> Optional[str]:
         """
         Функция проверит image. Если существует, то вернёт его url, иначе None.
 
-        :param image: Optional[ImageFieldFile].
+        :param obj: ProductImage.
         :return: Если существует image, то вернёт его url, иначе None.
         """
-        if image:
-            return image.url
+        if obj.image:
+            return obj.image.url
         return None
 
 
 class OutSpecificationSerializer(serializers.ModelSerializer[Specification]):
-    name = serializers.CharField(read_only=True, source="name")
-    value = serializers.CharField(read_only=True, source="value")
 
     class Meta:
         model = Specification
@@ -46,21 +44,16 @@ class OutProductSerializer(serializers.ModelSerializer[Product]):
     """
 
     id = serializers.IntegerField(read_only=True, source="pk")
-    category = serializers.IntegerField(read_only=True, source="category__pk")
+    category = serializers.SerializerMethodField(read_only=True)
     price = serializers.SerializerMethodField(read_only=True)
-    count = serializers.IntegerField(read_only=True, source="count")
     date = serializers.DateTimeField(read_only=True, source="created_at")
-    title = serializers.CharField(read_only=True, source="title")
-    description = serializers.CharField(read_only=True, source="description")
     fullDescription = serializers.CharField(read_only=True, source="full_description")
     freeDelivery = serializers.BooleanField(read_only=True, source="free_delivery")
-    tags = OutTagSerializer(many=True, read_only=True, source="tags")
-    images = OutProductImageSerializer(many=True, read_only=True, source="images")
-    specifications = OutSpecificationSerializer(
-        many=True, read_only=True, source="specifications"
-    )
+    tags = serializers.SerializerMethodField(read_only=True)
+    images = OutProductImageSerializer(many=True, read_only=True)
+    specifications = OutSpecificationSerializer(many=True, read_only=True)
     rating = serializers.SerializerMethodField(read_only=True)
-    reviews = ReviewSerializer(read_only=True, source="reviews", many=True)
+    reviews = ReviewSerializer(read_only=True, many=True)
 
     class Meta:
         model = Product
@@ -105,3 +98,17 @@ class OutProductSerializer(serializers.ModelSerializer[Product]):
 
         rating = Review.objects.filter(product=obj).aggregate(rating=Avg("rate"))
         return round(rating["rating"], 2) if rating else None
+
+    @staticmethod
+    def get_category(obj: Product) -> int:
+        """
+        Возвращает id подкатегории, к которой принадлежит продукт.
+
+        :param obj: Product.
+        :return: Id подкатегории.
+        """
+        return int(obj.category.pk)
+
+    @staticmethod
+    def get_tags(obj: Product) -> List[str]:
+        return [tag.name for tag in obj.tags.all()]
