@@ -8,7 +8,6 @@ class OutTagSerializer(serializers.ModelSerializer[Tag]):
     """
 
     id = serializers.IntegerField(read_only=True, source="pk")
-    name = serializers.CharField(read_only=True, source="name")
 
     class Meta:
         model = Tag

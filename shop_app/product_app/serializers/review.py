@@ -1,6 +1,5 @@
-from rest_framework import serializers
-
 from product_app.models import Review
+from rest_framework import serializers
 
 
 class ReviewSerializer(serializers.ModelSerializer[Review]):
@@ -8,11 +7,16 @@ class ReviewSerializer(serializers.ModelSerializer[Review]):
     Serializer для модели Review.
     """
 
-    date = serializers.DateTimeField(source='created_at', format='%Y-%m-%d %H:%M')
-
     class Meta:
         model = Review
-        fields = 'author', 'email', 'text', 'rate', 'date'
+        fields = "author", "email", "text", "rate", "date"
+        extra_kwargs = {
+            "author": {"required": True},
+            "email": {"required": True},
+            "text": {"required": True},
+            "rate": {"required": True},
+            "date": {"required": True},
+        }
 
     @staticmethod
     def validate_author(value: str) -> str:

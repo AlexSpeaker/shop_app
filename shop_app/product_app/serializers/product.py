@@ -61,6 +61,7 @@ class OutProductSerializer(serializers.ModelSerializer[Product]):
     )
     rating = serializers.SerializerMethodField(read_only=True)
     reviews = ReviewSerializer(read_only=True, source="reviews", many=True)
+
     class Meta:
         model = Product
         fields = (
