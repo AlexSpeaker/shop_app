@@ -6,7 +6,7 @@ from string import ascii_letters
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from product_app.models import Category, SubCategory
-from product_app.serializers.categories import CategorySerializer
+from product_app.serializers.category import OutCategorySerializer
 
 
 class CategorySerializerTests(TestCase):
@@ -16,7 +16,7 @@ class CategorySerializerTests(TestCase):
 
     __files_for_test_dir = Path(__file__).parent.parent.parent / "files_for_test"
     __valid_file_path = __files_for_test_dir / "image.png"
-    category_serializer = CategorySerializer
+    category_serializer = OutCategorySerializer
 
     @classmethod
     def setUpClass(cls) -> None:

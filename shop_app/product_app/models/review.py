@@ -1,5 +1,4 @@
-from django.contrib.auth.models import User
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from product_app.models import Product
@@ -9,14 +8,15 @@ class Review(models.Model):
     """
     Модель отзыва.
 
-    **user** - Пользователь. \n
+    **author** - Имя пользователя (вводит сам). \n
+    **email** - Email пользователя (вводит сам). \n
     **product** - Продукт. \n
     **text** - Текст отзыва. \n
     **created_at** - Дата написания отзыва. \n
     **rate** - Оценка.
     """
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews")
+    author = models.CharField(default="Anonymous", max_length=100, blank=False, null=False)
+    email = models.EmailField(max_length=100, blank=False, null=False)
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="reviews"
     )
@@ -26,7 +26,7 @@ class Review(models.Model):
         _("rate"),
         null=False,
         blank=False,
-        validators=[MinValueValidator(0), MaxValueValidator(5)],
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
     )
 
     def __str__(self) -> str:

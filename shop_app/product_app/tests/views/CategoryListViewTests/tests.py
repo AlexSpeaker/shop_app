@@ -3,6 +3,7 @@ from string import ascii_letters
 
 from django.urls import reverse
 from product_app.models import Category, SubCategory
+from product_app.serializers.category import OutCategorySerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APITestCase
@@ -14,6 +15,7 @@ class CategoryListViewTests(APITestCase):
     """
 
     url = reverse("product_app:categories")
+    category_serializer = OutCategorySerializer
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -45,8 +47,10 @@ class CategoryListViewTests(APITestCase):
         response: Response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data_list = response.data
-        self.assertTrue(isinstance(data_list, list))
-        self.assertTrue(len(data_list) == Category.objects.all().count())
+        categories = Category.objects.prefetch_related("subcategories").all()
+        self.assertEqual(
+            data_list, self.category_serializer(instance=categories, many=True).data
+        )
 
     @classmethod
     def tearDownClass(cls) -> None:

@@ -2,7 +2,7 @@ from typing import Any
 
 from drf_spectacular.utils import extend_schema
 from product_app.models import Category
-from product_app.serializers.categories import CategorySerializer
+from product_app.serializers.category import OutCategorySerializer
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
@@ -13,11 +13,11 @@ class CategoryListView(ListAPIView[Category]):
     """
 
     queryset = Category.objects.prefetch_related("subcategories").all()
-    serializer_class = CategorySerializer
+    serializer_class = OutCategorySerializer
 
     @extend_schema(
         request=None,
-        responses=CategorySerializer,
+        responses=OutCategorySerializer,
         description="Получение списка категорий.",
         tags=("Catalog",),
     )

@@ -5,4 +5,5 @@ app_name = "product_app"
 
 urlpatterns = [
     path("categories", CategoryListView.as_view(), name="categories"),
+    # path("tags", TagsListView.as_view(), name="tags"),
 ]
