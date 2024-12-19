@@ -1,9 +1,7 @@
-from datetime import date
 from decimal import Decimal
 from typing import List, Optional
 
-from django.db.models import Avg, Q
-from product_app.models import Product, ProductImage, Sale, Specification
+from product_app.models import Product, ProductImage, Specification
 from product_app.serializers.review import ReviewSerializer
 from product_app.serializers.tag import OutTagSerializer
 from rest_framework import serializers
