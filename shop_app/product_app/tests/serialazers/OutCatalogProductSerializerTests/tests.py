@@ -1,15 +1,15 @@
 from django.test import TestCase
 from product_app.models import Category, Product, SubCategory, Tag
-from product_app.serializers.product import OutProductSerializer
+from product_app.serializers.product import OutCatalogProductSerializer
 from product_app.tests.utils import get_product
 
 
-class ProductSerializerTests(TestCase):
+class OutCatalogProductSerializerTests(TestCase):
     """
-    Класс Тест для сериализатора OutProductSerializer.
+    Класс Тест для сериализатора OutCatalogProductSerializer.
     """
 
-    product_serializer = OutProductSerializer
+    product_serializer = OutCatalogProductSerializer
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -35,6 +35,7 @@ class ProductSerializerTests(TestCase):
         )
         serializer = self.product_serializer(product)
         data = serializer.data
+
         set_keys = {
             "id",
             "category",
@@ -43,12 +44,10 @@ class ProductSerializerTests(TestCase):
             "date",
             "title",
             "description",
-            "fullDescription",
             "freeDelivery",
             "images",
             "tags",
             "reviews",
-            "specifications",
             "rating",
         }
         self.assertEqual(set_keys, set(data.keys()))
@@ -56,16 +55,10 @@ class ProductSerializerTests(TestCase):
         set_images_keys = {"src", "alt"}
         self.assertEqual(set_images_keys, set(data["images"][0].keys()))
 
-        set_tags_name = {
-            tag.name
-            for tag in Tag.objects.prefetch_related("products").filter(
-                products__pk=product.pk
-            )
-        }
-        self.assertEqual(set_tags_name, set(data["tags"]))
+        set_tags_keys = {"id", "name"}
+        self.assertEqual(set_tags_keys, set(data["tags"][0].keys()))
 
-        set_specifications_keys = {"name", "value"}
-        self.assertEqual(set_specifications_keys, set(data["specifications"][0].keys()))
+        self.assertTrue(isinstance(data["reviews"], int))
 
     @classmethod
     def tearDownClass(cls) -> None:

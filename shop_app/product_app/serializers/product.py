@@ -1,16 +1,19 @@
 from datetime import date
 from decimal import Decimal
-from typing import Optional, List
+from typing import List, Optional
 
 from django.db.models import Avg, Q
-from django.db.models.fields.files import ImageFieldFile
-from product_app.models import Product, ProductImage, Review, Sale, Specification
+from product_app.models import Product, ProductImage, Sale, Specification
 from product_app.serializers.review import ReviewSerializer
 from product_app.serializers.tag import OutTagSerializer
 from rest_framework import serializers
 
 
 class OutProductImageSerializer(serializers.ModelSerializer[ProductImage]):
+    """
+    Serializer для ProductImage.
+    """
+
     src = serializers.SerializerMethodField(read_only=True)
     alt = serializers.CharField(read_only=True, source="title")
 
@@ -26,12 +29,13 @@ class OutProductImageSerializer(serializers.ModelSerializer[ProductImage]):
         :param obj: ProductImage.
         :return: Если существует image, то вернёт его url, иначе None.
         """
-        if obj.image:
-            return obj.image.url
-        return None
+        return obj.image.url if obj.image else None
 
 
 class OutSpecificationSerializer(serializers.ModelSerializer[Specification]):
+    """
+    Serializer для Specification.
+    """
 
     class Meta:
         model = Specification
@@ -96,7 +100,7 @@ class OutProductSerializer(serializers.ModelSerializer[Product]):
         :return: Optional[float].
         """
 
-        rating = Review.objects.filter(product=obj).aggregate(rating=Avg("rate"))
+        rating = obj.reviews.aggregate(rating=Avg("rate"))
         return round(rating["rating"], 2) if rating else None
 
     @staticmethod
@@ -112,3 +116,80 @@ class OutProductSerializer(serializers.ModelSerializer[Product]):
     @staticmethod
     def get_tags(obj: Product) -> List[str]:
         return [tag.name for tag in obj.tags.all()]
+
+
+class OutCatalogProductSerializer(serializers.ModelSerializer[Product]):
+    """
+    Serializer для модели Product (для каталога).
+    """
+
+    id = serializers.IntegerField(read_only=True, source="pk")
+    category = serializers.SerializerMethodField(read_only=True)
+    price = serializers.SerializerMethodField(read_only=True)
+    date = serializers.DateTimeField(read_only=True, source="created_at")
+    freeDelivery = serializers.BooleanField(read_only=True, source="free_delivery")
+    images = OutProductImageSerializer(many=True, read_only=True)
+    tags = OutTagSerializer(many=True, read_only=True)
+    reviews = serializers.SerializerMethodField(read_only=True)
+    rating = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Product
+        fields = (
+            "id",
+            "category",
+            "price",
+            "count",
+            "date",
+            "title",
+            "description",
+            "freeDelivery",
+            "images",
+            "tags",
+            "reviews",
+            "rating",
+        )
+
+    @staticmethod
+    def get_category(obj: Product) -> int:
+        """
+        Возвращает id подкатегории, к которой принадлежит продукт.
+
+        :param obj: Product.
+        :return: Id подкатегории.
+        """
+        return int(obj.category.pk)
+
+    @staticmethod
+    def get_price(obj: Product) -> Decimal:
+        """
+        Определит текущую цену на продукт (учитывает действующую акцию).
+
+        :param obj: Product.
+        :return: Цена.
+        """
+
+        sale = Sale.objects.filter(Q(product=obj), Q(date_to__gte=date.today())).first()
+        return sale.sale_price if sale else obj.price
+
+    @staticmethod
+    def get_reviews(obj: Product) -> int:
+        """
+        Определит количество отзывов.
+
+        :return: Количество отзывов
+        """
+        return int(obj.reviews.count())
+
+    @staticmethod
+    def get_rating(obj: Product) -> Optional[float]:
+        """
+        Функция определит средний рейтинг продукта.
+        Если рейтинга ещё нет - вернёт None.
+
+        :param obj: Product.
+        :return: Optional[float].
+        """
+
+        rating = obj.reviews.aggregate(rating=Avg("rate"))
+        return round(rating["rating"], 2) if rating else None
