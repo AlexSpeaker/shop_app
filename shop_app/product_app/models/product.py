@@ -94,7 +94,7 @@ class Product(models.Model):
         :return: Средний рейтинг.
         """
         rating = self.reviews.aggregate(rating=Avg("rate"))
-        return round(rating["rating"], 2) if rating else None
+        return round(rating["rating"], 2) if rating["rating"] else None
 
     def __str__(self) -> str:
         """
