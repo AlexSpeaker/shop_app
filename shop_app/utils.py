@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from json import JSONDecodeError
 from typing import Any, Dict
 
@@ -71,3 +72,22 @@ class PasswordValidator:
         # Проверка длины пароля
         if len(value) < self.min_length or len(value) > self.max_length:
             raise ValidationError(self.message)
+
+
+def parser_query_params(query_params: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Функция преобразует параметры типа: param_name[param_sub_name],
+    в параметр param_name со своим словарём {sub_name: value}.
+
+    :param query_params: Query параметры в виде словаря.
+    :return: Dict[str, Any]
+    """
+    response_dict: Dict[str, Any] = {}
+    for key, value in query_params.items():
+        pattern = r"^([^\[]+)\[([^\]]+)\]$"
+        match = re.match(pattern, key)
+        if match:
+            response_dict.setdefault(match.group(1), {})[match.group(2)] = value
+        else:
+            response_dict[key] = value
+    return response_dict

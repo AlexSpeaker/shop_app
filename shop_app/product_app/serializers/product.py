@@ -87,8 +87,7 @@ class OutProductSerializer(serializers.ModelSerializer[Product]):
         :return: Цена.
         """
 
-        sale = Sale.objects.filter(Q(product=obj), Q(date_to__gte=date.today())).first()
-        return sale.sale_price if sale else obj.price
+        return obj.get_actual_price()
 
     @staticmethod
     def get_rating(obj: Product) -> Optional[float]:
@@ -100,8 +99,7 @@ class OutProductSerializer(serializers.ModelSerializer[Product]):
         :return: Optional[float].
         """
 
-        rating = obj.reviews.aggregate(rating=Avg("rate"))
-        return round(rating["rating"], 2) if rating else None
+        return obj.get_rating()
 
     @staticmethod
     def get_category(obj: Product) -> int:
@@ -169,8 +167,7 @@ class OutCatalogProductSerializer(serializers.ModelSerializer[Product]):
         :return: Цена.
         """
 
-        sale = Sale.objects.filter(Q(product=obj), Q(date_to__gte=date.today())).first()
-        return sale.sale_price if sale else obj.price
+        return obj.get_actual_price()
 
     @staticmethod
     def get_reviews(obj: Product) -> int:
@@ -191,5 +188,4 @@ class OutCatalogProductSerializer(serializers.ModelSerializer[Product]):
         :return: Optional[float].
         """
 
-        rating = obj.reviews.aggregate(rating=Avg("rate"))
-        return round(rating["rating"], 2) if rating else None
+        return obj.get_rating()

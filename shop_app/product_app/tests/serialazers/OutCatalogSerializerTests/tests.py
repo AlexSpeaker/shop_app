@@ -46,6 +46,22 @@ class OutCatalogSerializerTests(TestCase):
 
         self.assertTrue(data["lastPage"] == total_pages)
 
+        set_product_keys = {
+            "id",
+            "category",
+            "price",
+            "count",
+            "date",
+            "title",
+            "description",
+            "freeDelivery",
+            "images",
+            "tags",
+            "reviews",
+            "rating",
+        }
+        self.assertEqual(set_product_keys, set(data["items"][0].keys()))
+
     @classmethod
     def tearDownClass(cls) -> None:
         """

@@ -1,5 +1,10 @@
+from decimal import Decimal
+from typing import Optional
+
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import Avg
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from product_app.models.subcategory import SubCategory
 from product_app.models.tag import Tag
@@ -57,6 +62,39 @@ class Product(models.Model):
     archived = models.BooleanField(
         _("archived"), default=False, null=False, blank=False
     )
+
+    def get_actual_price(self) -> Decimal:
+        """
+        Возвращает цену с учетом активной акции.
+        :return: Актуальная цена.
+        """
+        today = timezone.now().date()
+        active_sale = self.sales.filter(
+            date_from__lte=today, date_to__gte=today
+        ).first()
+        return active_sale.sale_price if active_sale else self.price
+
+    def get_imaginary_price(self) -> Optional[Decimal]:
+        """
+        Возвращает мнимую цену с учетом активной акции.
+        Эта та цена, которая якобы была до акции (задаётся при создании акции).
+
+        :return: Мнимую цену, если акция есть, иначе None.
+        """
+        today = timezone.now().date()
+        active_sale = self.sales.filter(
+            date_from__lte=today, date_to__gte=today
+        ).first()
+        return active_sale.price if active_sale else None
+
+    def get_rating(self) -> Optional[float]:
+        """
+        Вернёт средний рейтинг продукта.
+
+        :return: Средний рейтинг.
+        """
+        rating = self.reviews.aggregate(rating=Avg("rate"))
+        return round(rating["rating"], 2) if rating else None
 
     def __str__(self) -> str:
         """

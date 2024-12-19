@@ -29,7 +29,7 @@ class OutCatalogProductSerializerTests(TestCase):
         """
         product: Product = (
             Product.objects.select_related("category")
-            .prefetch_related("tags", "images", "specifications", "reviews")
+            .prefetch_related("tags", "images", "reviews", "sales", "specifications")
             .all()
             .first()
         )
