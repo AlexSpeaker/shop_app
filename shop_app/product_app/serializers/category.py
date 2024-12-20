@@ -53,3 +53,11 @@ class OutCategorySerializer(serializers.ModelSerializer[Category]):
     class Meta:
         model = Category
         fields = "id", "title", "image", "subcategories"
+
+
+class InCategoryIDSerializer(serializers.Serializer):
+    """
+    Serializer для id категории.
+    """
+
+    category_id = serializers.IntegerField(read_only=True, min_value=1)

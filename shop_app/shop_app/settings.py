@@ -157,3 +157,27 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
 }
 FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
+
+# LOGGING = {
+#     "version": 1,
+#     "formatters": {
+#         "simple": {
+#             "format": "{asctime} {message}",
+#             "style": "{",
+#         },
+#     },
+#     "filters": {
+#         "require_debug_true": {
+#             "()": "django.utils.log.RequireDebugTrue",
+#         }
+#     },
+#     "handlers": {
+#         "console": {
+#             "level": "DEBUG",
+#             "filters": ["require_debug_true"],
+#             "class": "logging.StreamHandler",
+#             "formatter": "simple",
+#         }
+#     },
+#     "loggers": {"django.db.backends": {"level": "DEBUG", "handlers": ["console"]}},
+# }

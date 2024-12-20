@@ -25,7 +25,6 @@ class InFilterSerializer(serializers.Serializer[Dict[str, Any]]):
     name = serializers.CharField(
         max_length=500,
         allow_null=False,
-        required=True,
         allow_blank=True,
     )
     minPrice = serializers.DecimalField(
@@ -44,6 +43,19 @@ class InFilterSerializer(serializers.Serializer[Dict[str, Any]]):
     )
     freeDelivery = serializers.BooleanField(allow_null=False, required=True)
     available = serializers.BooleanField(allow_null=False, required=True)
+
+    def validate(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Дополнительная валидация для параметров фильтра.
+
+        :param data: Dict[str, Any].
+        :return: Dict[str, Any].
+        """
+        if data["minPrice"] > data["maxPrice"]:
+            raise serializers.ValidationError(
+                "Минимальная цена не может быть больше максимальной цены."
+            )
+        return data
 
 
 class InCatalogSerializer(serializers.Serializer[Dict[str, Any]]):
@@ -68,3 +80,4 @@ class InCatalogSerializer(serializers.Serializer[Dict[str, Any]]):
         choices=[("inc", "inc"), ("dec", "dec")], required=False
     )
     limit = serializers.IntegerField(allow_null=False, required=True, min_value=1)
+    tags = serializers.ListField(required=False, allow_empty=True, child=serializers.IntegerField(min_value=1))

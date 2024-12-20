@@ -5,6 +5,7 @@ from json import JSONDecodeError
 from typing import Any, Dict
 
 from django.core.validators import RegexValidator
+from django.http import QueryDict
 from rest_framework.exceptions import ValidationError
 
 
@@ -74,20 +75,27 @@ class PasswordValidator:
             raise ValidationError(self.message)
 
 
-def parser_query_params(query_params: Dict[str, Any]) -> Dict[str, Any]:
+def parser_query_params(query_params: QueryDict) -> Dict[str, Any]:
     """
-    Функция преобразует параметры типа: param_name[param_sub_name],
-    в параметр param_name со своим словарём {sub_name: value}.
+    Функция преобразует параметры типа: param_name[param_sub_name] = value,
+    в параметр param_name со своим словарём {param_sub_name: value},
+    а также param_name[] = value в список param_name = [value1, value2, ...].
 
     :param query_params: Query параметры в виде словаря.
     :return: Dict[str, Any]
     """
     response_dict: Dict[str, Any] = {}
     for key, value in query_params.items():
-        pattern = r"^([^\[]+)\[([^\]]+)\]$"
-        match = re.match(pattern, key)
-        if match:
-            response_dict.setdefault(match.group(1), {})[match.group(2)] = value
+        pattern_dict = r"^([^\[]+)\[([^\]]+)\]$"
+        pattern_list = r"^([^\[]+)\[\]$"
+        match_dict = re.match(pattern_dict, key)
+        match_list = re.match(pattern_list, key)
+        if match_dict:
+            response_dict.setdefault(match_dict.group(1), {})[match_dict.group(2)] = value
+        elif match_list:
+            response_dict.setdefault(match_list.group(1), []).extend(query_params.getlist(f'{match_list.group(1)}[]'))
         else:
             response_dict[key] = value
+
+
     return response_dict

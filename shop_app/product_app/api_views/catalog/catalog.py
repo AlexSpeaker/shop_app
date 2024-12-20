@@ -1,6 +1,13 @@
+from typing import List
+
 from django.core.paginator import Paginator
-from django.db.models import Avg, Case, DecimalField, F, Q, When, Count
+from django.db.models import Avg, Case, Count, DecimalField, F, Q, When
 from django.utils import timezone
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from referencing.jsonschema import Schema
+
+from product_app.api_views.catalog.utils import get_catalog_filters, get_catalog_sort
 from product_app.models import Product
 from product_app.serializers.catalog import InCatalogSerializer, OutCatalogSerializer
 from rest_framework import status
@@ -21,6 +28,74 @@ class CatalogAPIView(APIView):
     )
     catalog_serializer = OutCatalogSerializer
 
+    @extend_schema(
+        request=None,
+        responses=OutCatalogSerializer,
+        description="Получение списка продуктов с учётом заданных параметров.",
+        tags=("Catalog",),
+        parameters=[
+            OpenApiParameter(
+                "filter[name]",
+                str,
+                description="Фильтр по имени продукта.",
+                required=True,
+            ),
+            OpenApiParameter(
+                "filter[minPrice]",
+                float,
+                description="Минимальная цена продукта.",
+                required=True,
+            ),
+            OpenApiParameter(
+                "filter[maxPrice]",
+                float,
+                description="Максимальная цена продукта.",
+                required=True,
+            ),
+            OpenApiParameter(
+                "filter[freeDelivery]",
+                bool,
+                description="Фильтр по бесплатной доставке.",
+                required=True,
+            ),
+            OpenApiParameter(
+                "filter[available]",
+                bool,
+                description="Фильтр по доступности продукта.",
+                required=True,
+            ),
+            OpenApiParameter(
+                "currentPage", int, description="Номер текущей страницы.", required=True
+            ),
+            OpenApiParameter(
+                "category", int, description="ID категории продукта.", required=True
+            ),
+            OpenApiParameter(
+                "sort",
+                str,
+                description="Параметр сортировки (например, 'price').",
+                required=True,
+            ),
+            OpenApiParameter(
+                "sortType",
+                str,
+                description="Тип сортировки (например, 'inc' или 'dec').",
+                required=True,
+            ),
+            OpenApiParameter(
+                "limit",
+                int,
+                description="Количество продуктов на странице.",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="tags[]",
+                type={"type": "array", "items": {"type": "integer"}},
+                description="Список id тегов для фильтрации.",
+                required=False,
+            ),
+        ],
+    )
     def get(self, request: Request) -> Response:
         """
         Получение списка продуктов с учётом переданных параметров.
@@ -28,66 +103,46 @@ class CatalogAPIView(APIView):
         :param request: Request.
         :return: Response.
         """
-        query_data = request.GET.dict()
+        query_data = request.GET
         data = parser_query_params(query_data)
         q_serializer = self.query_serializer(data=data)
         if not q_serializer.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        # Получаем фильтры.
+        filter_params = get_catalog_filters(q_serializer.validated_data)
 
-        filter_data = q_serializer.validated_data["filter"]
-        # Создаём простые фильтры.
-        filter_name = Q(title__icontains=filter_data["name"])
-        filter_free_delivery = Q(free_delivery=filter_data["freeDelivery"])
-        filter_available = Q(count__gt=0) if filter_data["available"] else Q(count=0)
-        # А также применяем категорию и не архивированные продукты.
-        category = Q(category__id=q_serializer.validated_data["category"])
-        archived = Q(archived=False)
-        # Применяем их.
-        pre_products_with_filter = self.queryset.filter(
-            filter_name & filter_free_delivery & filter_available & category & archived
-        )
-        # Сложный фильтр. Если у продукта есть действующая акция,
+        # Получаем сортировку.
+        sort = get_catalog_sort(q_serializer.validated_data)
+
+        # Если у продукта есть действующая акция,
         # то final_price будет от акции, иначе от продукта,
-        # и всё это дело (final_price) пропускаем через фильтр max_price и min_price.
-        products_with_filter = pre_products_with_filter.annotate(
-            final_price=Case(
-                # Если акция активна, используем цену со скидкой.
-                When(
-                    Q(sales__date_from__lte=timezone.now().date())
-                    & Q(sales__date_to__gte=timezone.now().date()),
-                    then=F("sales__sale_price"),
+        # и всё это дело пропускаем через фильтр max_price и min_price плюс созданные фильтры выше.
+        products = (
+            self.queryset.annotate(
+                final_price=Case(
+                    # Если акция активна, используем цену со скидкой
+                    # (действующая акция может быть только одна).
+                    When(
+                        Q(sales__date_from__lte=timezone.now().date())
+                        & Q(sales__date_to__gte=timezone.now().date()),
+                        then=F("sales__sale_price"),
+                    ),
+                    # Иначе используем стандартную цену.
+                    default=F("price"),
+                    output_field=DecimalField(),
                 ),
-                # Иначе используем стандартную цену.
-                default=F("price"),
-                output_field=DecimalField(),
+                # Добавим недостающие поля для продуктов (для сортировки).
+                rating=Avg("reviews__rate"),
+                reviews_count=Count("reviews"),
             )
-        ).filter(
-            # Фильтруем по max_price и min_price.
-            final_price__gte=filter_data["minPrice"],
-            final_price__lte=filter_data["maxPrice"],
+            .filter(
+                # Фильтруем по заданным параметрам.
+                Q(final_price__gte=q_serializer.validated_data["filter"]["minPrice"])
+                & Q(final_price__lte=q_serializer.validated_data["filter"]["maxPrice"])
+                & filter_params
+            )
+            .order_by(sort)
         )
-        # Переопределяем названия сортировки,
-        # так как эти названия пересекаются с полями продукта или вовсе отсутствуют,
-        # например reviews в продукте - это связанная сущность, а не количество отзывов,
-        # а price у нас, после применения аннотации, теперь final_price...
-        if q_serializer.validated_data["sort"] == "price":
-            pre_sort = "final_price"
-        elif q_serializer.validated_data["sort"] == "reviews":
-            pre_sort = "reviews_count"
-        elif q_serializer.validated_data["sort"] == "date":
-            pre_sort = "created_at"
-        else:
-            pre_sort = q_serializer.validated_data["sort"]
-        # Определяем тип сортировки (убывание/возрастание).
-        sort = (
-            f"-{pre_sort}"
-            if q_serializer.validated_data["sortType"] == "dec"
-            else pre_sort
-        )
-        # Добавим недостающие поля для продуктов (для сортировки).
-        products = products_with_filter.annotate(
-            rating=Avg("reviews__rate"), reviews_count=Count("reviews")
-        ).order_by(sort)
 
         paginator = Paginator(products, q_serializer.validated_data["limit"])
         page_odj = paginator.get_page(q_serializer.validated_data["currentPage"])

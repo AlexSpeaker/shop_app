@@ -9,7 +9,7 @@ from django.http import HttpRequest
 from django.utils.html import format_html
 from django.utils.safestring import SafeString
 from django.utils.translation import gettext_lazy as _
-from product_app.models import Product, ProductImage, Review, Sale
+from product_app.models import Product, ProductImage, Review, Sale, Specification
 
 if TYPE_CHECKING:
 
@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     ImageTabularInline = admin.TabularInline[ProductImage, Product]
     ReviewTabularInline = admin.TabularInline[Review, Product]
     SaleTabularInline = admin.TabularInline[Sale, Product]
+    SpecificationTabularInline = admin.TabularInline[Specification, Product]
     BaseInlineFormSet = _BaseInlineFormSet[Sale, Product, ModelForm[Sale]]
 else:
 
@@ -24,6 +25,7 @@ else:
     ImageTabularInline = admin.TabularInline
     ReviewTabularInline = admin.TabularInline
     SaleTabularInline = admin.TabularInline
+    SpecificationTabularInline = admin.TabularInline
     BaseInlineFormSet = _BaseInlineFormSet
 
 
@@ -117,13 +119,28 @@ class ProductSaleInline(SaleTabularInline):
         return formset
 
 
+class ProductSpecificationInline(SpecificationTabularInline):
+    """
+    Inline класс спецификаций продукта.
+    """
+
+    model = Specification
+    verbose_name_plural = _("Specifications")
+    extra = 1
+
+
 @admin.register(Product)
 class ProductAdmin(ModelAdmin):
     """
     Класс админка для продукта.
     """
 
-    inlines = (ProductImageInline, ProductReviewsInline, ProductSaleInline)
+    inlines = (
+        ProductImageInline,
+        ProductReviewsInline,
+        ProductSaleInline,
+        ProductSpecificationInline,
+    )
     list_display = ("pk", "title", "price", "count", "archived")
     list_display_links = (
         "pk",
