@@ -15,11 +15,11 @@ from product_app.models import (
 )
 
 
-def get_product() -> Product:
+def get_simple_img_file() -> SimpleUploadedFile:
     """
-    Создаём продукт со всеми связанными сущностями.
+    Функция возвращает файл картинки.
 
-    :return: Product.
+    :return: SimpleUploadedFile
     """
     files_for_test_dir = Path(__file__).parent / "files_for_test"
     valid_file_path = files_for_test_dir / "image.png"
@@ -29,11 +29,51 @@ def get_product() -> Product:
             content=valid_file.read(),
             content_type="image/png",
         )
-    tag = Tag.objects.create(name="".join(choices(ascii_letters, k=6)))
-    category = Category.objects.create(name="".join(choices(ascii_letters, k=6)))
-    subcategory = SubCategory.objects.create(
+    return image_file
+
+
+def get_tag() -> Tag:
+    """
+    Функция создаёт и возвращает тег.
+
+    :return: Tag.
+    """
+    tag: Tag = Tag.objects.create(name="".join(choices(ascii_letters, k=6)))
+    return tag
+
+
+def get_category() -> Category:
+    """
+    Функция создаёт и возвращает категорию.
+
+    :return: Category
+    """
+    category: Category = Category.objects.create(
+        name="".join(choices(ascii_letters, k=6))
+    )
+    return category
+
+
+def get_sub_category(category: Category) -> SubCategory:
+    """
+    Функция создаёт и возвращает подкатегорию.
+
+    :param category: Category.
+    :return: SubCategory.
+    """
+    sub_category: SubCategory = SubCategory.objects.create(
         name="".join(choices(ascii_letters, k=6)), category=category
     )
+    return sub_category
+
+
+def get_simple_product(subcategory: SubCategory) -> Product:
+    """
+    Функция создаёт и возвращает простой продукт.
+
+    :param subcategory: SubCategory.
+    :return: Product.
+    """
     product: Product = Product.objects.create(
         category=subcategory,
         title="".join(choices(ascii_letters, k=6)),
@@ -42,9 +82,17 @@ def get_product() -> Product:
         description="".join(choices(ascii_letters, k=6)),
         full_description="".join(choices(ascii_letters, k=6)),
     )
-    product.tags.add(tag)
-    product.save()
-    Review.objects.create(
+    return product
+
+
+def get_review(product: Product) -> Review:
+    """
+    Функция создаёт и возвращает отзыв на продукт.
+
+    :param product: Product.
+    :return: Review.
+    """
+    review: Review = Review.objects.create(
         product=product,
         author="".join(choices(ascii_letters, k=6)),
         email=f'{"".join(choices(ascii_letters, k=6))}@{"".join(choices(ascii_letters, k=6))}.com',
@@ -52,14 +100,53 @@ def get_product() -> Product:
         rate=randint(1, 5),
         date=now(),
     )
-    Specification.objects.create(
+    return review
+
+
+def get_specification(product: Product) -> Specification:
+    """
+    Функция создаёт и возвращает спецификацию продукта.
+
+    :param product: Product.
+    :return: Specification.
+    """
+    specification: Specification = Specification.objects.create(
         product=product,
         name="".join(choices(ascii_letters, k=6)),
         value="".join(choices(ascii_letters, k=6)),
     )
-    ProductImage.objects.create(
+    return specification
+
+
+def get_product_image(product: Product) -> ProductImage:
+    """
+    Функция создаёт и возвращает картинку продукта.
+
+    :param product: Product.
+    :return: ProductImage.
+    """
+    product_image: ProductImage = ProductImage.objects.create(
         product=product,
-        image=image_file,
+        image=get_simple_img_file(),
         title="".join(choices(ascii_letters, k=6)),
     )
+    return product_image
+
+
+def get_product() -> Product:
+    """
+    Создаём продукт со всеми связанными сущностями.
+
+    :return: Product.
+    """
+    category = get_category()
+    sub_category = get_sub_category(category)
+    tag = get_tag()
+    product = get_simple_product(sub_category)
+    product.tags.add(tag)
+    product.save()
+    get_review(product)
+    get_specification(product)
+    get_product_image(product)
+
     return product

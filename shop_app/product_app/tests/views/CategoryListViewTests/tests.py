@@ -59,7 +59,6 @@ class CategoryListViewTests(APITestCase):
 
         :return: None.
         """
-        for subcategory in cls.subcategories:
-            subcategory.delete()
+        SubCategory.objects.all().delete()
         cls.category.delete()
         super().tearDownClass()

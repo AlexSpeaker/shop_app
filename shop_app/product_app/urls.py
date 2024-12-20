@@ -8,5 +8,5 @@ app_name = "product_app"
 urlpatterns = [
     path("categories", CategoryListView.as_view(), name="categories"),
     path("catalog", CatalogAPIView.as_view(), name="catalog"),
-    path("tags", TagAPIView.as_view(), name="TagAPIView"),
+    path("tags", TagAPIView.as_view(), name="tags"),
 ]
