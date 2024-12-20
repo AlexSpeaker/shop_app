@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Any, Dict
 
 from django.db.models import Q
 
@@ -25,6 +25,7 @@ def get_catalog_filters(data: Dict[str, Any]) -> Q:
 
     return filter_params
 
+
 def get_catalog_sort(data: Dict[str, Any]) -> str:
     """
     Функция создаст параметр сортировки на основе переданных данных с некоторой заменой.
@@ -48,10 +49,5 @@ def get_catalog_sort(data: Dict[str, Any]) -> str:
         pre_sort = "created_at"
     else:
         pre_sort = data["sort"]
-    # Определяем тип сортировки (убывание/возрастание).
-    sort = (
-        f"-{pre_sort}"
-        if data["sortType"] == "inc"
-        else pre_sort
-    )
-    return sort
+    # Определяем тип сортировки (убывание/возрастание) и возвращаем.
+    return f"-{pre_sort}" if data["sortType"] == "inc" else pre_sort

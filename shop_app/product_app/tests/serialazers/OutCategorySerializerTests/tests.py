@@ -9,7 +9,7 @@ from product_app.models import Category, SubCategory
 from product_app.serializers.category import OutCategorySerializer
 
 
-class CategorySerializerTests(TestCase):
+class OutCategorySerializerTests(TestCase):
     """
     Класс Тест для сериализатора CategorySerializer.
     """

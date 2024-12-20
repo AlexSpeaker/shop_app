@@ -1,12 +1,7 @@
-from typing import List
-
 from django.core.paginator import Paginator
 from django.db.models import Avg, Case, Count, DecimalField, F, Q, When
 from django.utils import timezone
-from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-from referencing.jsonschema import Schema
-
 from product_app.api_views.catalog.utils import get_catalog_filters, get_catalog_sort
 from product_app.models import Product
 from product_app.serializers.catalog import InCatalogSerializer, OutCatalogSerializer

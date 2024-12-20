@@ -4,7 +4,7 @@ from product_app.serializers.product import OutProductSerializer
 from product_app.tests.utils import get_product
 
 
-class ProductSerializerTests(TestCase):
+class OutProductSerializerTests(TestCase):
     """
     Класс Тест для сериализатора OutProductSerializer.
     """

@@ -32,14 +32,14 @@ class InFilterSerializer(serializers.Serializer[Dict[str, Any]]):
         max_digits=10,
         decimal_places=2,
         allow_null=False,
-        min_value=Decimal("0"),
+        min_value=Decimal("1"),
     )
     maxPrice = serializers.DecimalField(
         required=True,
         max_digits=10,
         decimal_places=2,
         allow_null=False,
-        min_value=Decimal("0"),
+        min_value=Decimal("1"),
     )
     freeDelivery = serializers.BooleanField(allow_null=False, required=True)
     available = serializers.BooleanField(allow_null=False, required=True)
@@ -74,10 +74,12 @@ class InCatalogSerializer(serializers.Serializer[Dict[str, Any]]):
             ("reviews", "reviews"),
             ("date", "date"),
         ],
-        required=False,
+        required=True,
     )
     sortType = serializers.ChoiceField(
-        choices=[("inc", "inc"), ("dec", "dec")], required=False
+        choices=[("inc", "inc"), ("dec", "dec")], required=True
     )
     limit = serializers.IntegerField(allow_null=False, required=True, min_value=1)
-    tags = serializers.ListField(required=False, allow_empty=True, child=serializers.IntegerField(min_value=1))
+    tags = serializers.ListField(
+        required=False, allow_empty=False, child=serializers.IntegerField(min_value=1)
+    )

@@ -91,11 +91,14 @@ def parser_query_params(query_params: QueryDict) -> Dict[str, Any]:
         match_dict = re.match(pattern_dict, key)
         match_list = re.match(pattern_list, key)
         if match_dict:
-            response_dict.setdefault(match_dict.group(1), {})[match_dict.group(2)] = value
+            response_dict.setdefault(match_dict.group(1), {})[
+                match_dict.group(2)
+            ] = value
         elif match_list:
-            response_dict.setdefault(match_list.group(1), []).extend(query_params.getlist(f'{match_list.group(1)}[]'))
+            response_dict.setdefault(match_list.group(1), []).extend(
+                query_params.getlist(f"{match_list.group(1)}[]")
+            )
         else:
             response_dict[key] = value
-
 
     return response_dict

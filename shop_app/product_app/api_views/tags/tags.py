@@ -1,6 +1,5 @@
 from django.db.models import Count
-from drf_spectacular.utils import extend_schema, OpenApiParameter
-
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from product_app.models import Tag
 from product_app.serializers.category import InCategoryIDSerializer
 from product_app.serializers.tag import OutTagSerializer

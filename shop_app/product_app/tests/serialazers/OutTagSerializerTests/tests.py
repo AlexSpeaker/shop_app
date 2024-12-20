@@ -6,7 +6,7 @@ from product_app.models import Tag
 from product_app.serializers.tag import OutTagSerializer
 
 
-class TagSerializerTests(TestCase):
+class OutTagSerializerTests(TestCase):
     """
     Класс Тест для сериализатора OutTagSerializer.
     """

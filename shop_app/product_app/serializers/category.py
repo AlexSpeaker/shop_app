@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 from django.db.models.fields.files import ImageFieldFile
 from product_app.models import Category, SubCategory
@@ -55,9 +55,9 @@ class OutCategorySerializer(serializers.ModelSerializer[Category]):
         fields = "id", "title", "image", "subcategories"
 
 
-class InCategoryIDSerializer(serializers.Serializer):
+class InCategoryIDSerializer(serializers.Serializer[Dict[str, Any]]):
     """
     Serializer для id категории.
     """
 
-    category_id = serializers.IntegerField(read_only=True, min_value=1)
+    category_id = serializers.IntegerField(min_value=1)
