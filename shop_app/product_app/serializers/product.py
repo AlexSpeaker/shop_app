@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import List, Optional
+from typing import Optional
 
 from product_app.models import Product, ProductImage, Specification
 from product_app.serializers.review import ReviewSerializer
@@ -51,7 +51,7 @@ class OutProductSerializer(serializers.ModelSerializer[Product]):
     date = serializers.DateTimeField(read_only=True, source="created_at")
     fullDescription = serializers.CharField(read_only=True, source="full_description")
     freeDelivery = serializers.BooleanField(read_only=True, source="free_delivery")
-    tags = serializers.SerializerMethodField(read_only=True)
+    tags = OutTagSerializer(many=True, read_only=True)
     images = OutProductImageSerializer(many=True, read_only=True)
     specifications = OutSpecificationSerializer(many=True, read_only=True)
     rating = serializers.SerializerMethodField(read_only=True)
@@ -108,10 +108,6 @@ class OutProductSerializer(serializers.ModelSerializer[Product]):
         :return: Id подкатегории.
         """
         return int(obj.category.pk)
-
-    @staticmethod
-    def get_tags(obj: Product) -> List[str]:
-        return [tag.name for tag in obj.tags.all()]
 
 
 class OutCatalogProductSerializer(serializers.ModelSerializer[Product]):

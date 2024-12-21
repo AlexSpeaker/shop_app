@@ -2,9 +2,12 @@ import json
 import os
 import re
 from json import JSONDecodeError
-from typing import Any, Dict
+from typing import Any, Dict, TypeVar
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
+from django.db import models
+from django.db.models import QuerySet
 from django.http import QueryDict
 from rest_framework.exceptions import ValidationError
 
@@ -102,3 +105,21 @@ def parser_query_params(query_params: QueryDict) -> Dict[str, Any]:
             response_dict[key] = value
 
     return response_dict
+
+
+T = TypeVar("T", bound=models.Model)
+
+
+def get_or_none(queryset: QuerySet[T, T], **kwargs: Any) -> T | None:
+    """
+    Функция вернёт объект модели, если такой будет найден, иначе None.
+
+    :param queryset: Queryset модели.
+    :param kwargs: Параметры объекта.
+    :return: Объект модели, если такой будет найден, иначе None.
+    """
+    try:
+        obj: T = queryset.get(**kwargs)
+    except ObjectDoesNotExist:
+        return None
+    return obj
