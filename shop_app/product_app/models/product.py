@@ -87,14 +87,14 @@ class Product(models.Model):
         ).first()
         return active_sale.price if active_sale else None
 
-    def get_rating(self) -> Optional[float]:
+    def get_rating(self) -> float:
         """
         Вернёт средний рейтинг продукта.
 
         :return: Средний рейтинг.
         """
         rating = self.reviews.aggregate(rating=Avg("rate"))
-        return round(rating["rating"], 2) if rating["rating"] else None
+        return round(rating["rating"], 2) if rating["rating"] else 0
 
     def __str__(self) -> str:
         """

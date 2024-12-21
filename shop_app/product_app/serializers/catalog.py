@@ -32,14 +32,14 @@ class InFilterSerializer(serializers.Serializer[Dict[str, Any]]):
         max_digits=10,
         decimal_places=2,
         allow_null=False,
-        min_value=Decimal("1"),
+        min_value=Decimal("0"),
     )
     maxPrice = serializers.DecimalField(
         required=True,
         max_digits=10,
         decimal_places=2,
         allow_null=False,
-        min_value=Decimal("1"),
+        min_value=Decimal("0"),
     )
     freeDelivery = serializers.BooleanField(allow_null=False, required=True)
     available = serializers.BooleanField(allow_null=False, required=True)

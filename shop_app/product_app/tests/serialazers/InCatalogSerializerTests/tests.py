@@ -235,7 +235,7 @@ class InCatalogSerializerTests(TestCase):
 
         :return: None.
         """
-        min_price_invalid_data = ["a", 0, -1]
+        min_price_invalid_data = ["a", -1]
         for item in min_price_invalid_data:
             self.filter["minPrice"] = item
             serializer = self.in_catalog_serializer(data=self.valid_data)
@@ -259,7 +259,7 @@ class InCatalogSerializerTests(TestCase):
 
         :return: None.
         """
-        max_price_invalid_data = ["a", 0, -1]
+        max_price_invalid_data = ["a", -1]
         for item in max_price_invalid_data:
             self.filter["maxPrice"] = item
             serializer = self.in_catalog_serializer(data=self.valid_data)
