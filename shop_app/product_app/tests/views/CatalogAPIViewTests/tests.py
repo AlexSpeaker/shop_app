@@ -384,7 +384,7 @@ class CatalogAPIViewTests(APITestCase):
 
     def test_filter_price_with_sale(self) -> None:
         """
-        Проверим, учитывается ли цена акции при фильтре.
+        Проверим, учитывается ли цена действующей акции при фильтре.
 
         :return: None.
         """
@@ -409,6 +409,32 @@ class CatalogAPIViewTests(APITestCase):
         self.assertEqual(id_first_product, sale_product.id)
         self.assertFalse(price_first_product == sale_product.price)
         self.assertEqual(price_first_product, sale_product.sales.first().sale_price)
+
+    def test_filter_price_with_future_sale(self) -> None:
+        """
+        Проверим, что бы цена в недействующей акции не учитывалась.
+
+        :return: None.
+        """
+        for i, product in enumerate(self.list_products_cat_1, 1):
+            product.price = 100 * i
+        Product.objects.bulk_update(self.list_products_cat_1, ["price"])
+        sale_product = self.list_products_cat_1[-1]
+        Sale.objects.create(
+            product=sale_product,
+            date_from=now().date() + timedelta(days=3),
+            date_to=now().date() + timedelta(days=5),
+            price=sale_product.price,
+            sale_price=self.list_products_cat_1[0].price - 1,
+        )
+        self.valid_data["sort"] = "price"
+        self.valid_data["sortType"] = "dec"
+        response: Response = self.client.get(self.url, data=self.valid_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        id_first_product = response.data["items"][0]["id"]
+        self.assertFalse(id_first_product == sale_product.id)
+        self.assertTrue(id_first_product == self.list_products_cat_1[0].id)
 
     def tearDown(self) -> None:
         """
