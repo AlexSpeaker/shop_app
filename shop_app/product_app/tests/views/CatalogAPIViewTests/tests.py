@@ -1,8 +1,10 @@
 import random
+from datetime import timedelta
 from typing import Any, Dict
 
 from django.urls import reverse
-from product_app.models import Category, Product, SubCategory, Tag
+from django.utils.timezone import now
+from product_app.models import Category, Product, Sale, SubCategory, Tag
 from product_app.tests.utils import (
     get_category,
     get_review,
@@ -379,6 +381,34 @@ class CatalogAPIViewTests(APITestCase):
                 self.assertEqual(response_set_ids, available_ids_set)
             else:
                 self.assertTrue(available_ids_set.isdisjoint(response_set_ids))
+
+    def test_filter_price_with_sale(self) -> None:
+        """
+        Проверим, учитывается ли цена акции при фильтре.
+
+        :return: None.
+        """
+        for i, product in enumerate(self.list_products_cat_1, 1):
+            product.price = 100 * i
+        Product.objects.bulk_update(self.list_products_cat_1, ["price"])
+        sale_product = self.list_products_cat_1[-1]
+        Sale.objects.create(
+            product=sale_product,
+            date_from=now().date(),
+            date_to=now().date() + timedelta(days=3),
+            price=sale_product.price,
+            sale_price=self.list_products_cat_1[0].price - 1,
+        )
+        self.valid_data["sort"] = "price"
+        self.valid_data["sortType"] = "dec"
+        response: Response = self.client.get(self.url, data=self.valid_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        id_first_product = response.data["items"][0]["id"]
+        price_first_product = response.data["items"][0]["price"]
+        self.assertEqual(id_first_product, sale_product.id)
+        self.assertFalse(price_first_product == sale_product.price)
+        self.assertEqual(price_first_product, sale_product.sales.first().sale_price)
 
     def tearDown(self) -> None:
         """
