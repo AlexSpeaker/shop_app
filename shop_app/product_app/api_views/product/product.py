@@ -1,5 +1,4 @@
-from drf_spectacular.utils import extend_schema
-
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from product_app.models import Product
 from product_app.serializers.product import OutProductSerializer
 from rest_framework import status
@@ -9,7 +8,7 @@ from rest_framework.views import APIView
 from utils import get_or_none
 
 
-class ProductViewSet(APIView):
+class ProductView(APIView):
     """
     Класс APIView для продуктов.
     """
@@ -21,7 +20,10 @@ class ProductViewSet(APIView):
 
     @extend_schema(
         request=None,
-        responses=OutProductSerializer,
+        responses={
+            200: OutProductSerializer,
+            400: OpenApiResponse(description="Неверный запрос."),
+        },
         description="Получение подробной информации о продукте.",
         tags=("Product",),
     )

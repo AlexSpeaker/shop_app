@@ -3,7 +3,7 @@ from string import ascii_letters
 
 from django.db.models import Q
 from django.test import TestCase
-from django.utils.timezone import get_current_timezone, now
+from django.utils.timezone import now
 from product_app.models import Category, Product, Review, SubCategory, Tag
 from product_app.serializers.review import ReviewSerializer
 from product_app.tests.utils import get_product
@@ -78,10 +78,6 @@ class ReviewSerializerTests(TestCase):
         self.assertEqual(review.email, self.valid_data["email"])
         self.assertEqual(review.text, self.valid_data["text"])
         self.assertEqual(review.rate, self.valid_data["rate"])
-        local_review_date = review.date.astimezone(get_current_timezone())
-        self.assertEqual(
-            local_review_date.strftime("%Y-%m-%d %H:%M"), self.valid_data["date"]
-        )
 
     def test_no_valid_data_no_author(self) -> None:
         """
@@ -164,27 +160,27 @@ class ReviewSerializerTests(TestCase):
         with self.assertRaises(ValidationError):
             serializer.is_valid(raise_exception=True)
 
-    def test_no_valid_data_bad_date(self) -> None:
-        """
-        Тестируем невалидные данные: плохой date.
-
-        :return: None.
-        """
-        self.valid_data["date"] = "".join(choices(ascii_letters, k=6))
-        serializer = self.review_serializer(data=self.valid_data)
-        with self.assertRaises(ValidationError):
-            serializer.is_valid(raise_exception=True)
-
-    def test_no_valid_data_no_date(self) -> None:
-        """
-        Тестируем невалидные данные: нет date.
-
-        :return: None.
-        """
-        self.valid_data.pop("date")
-        serializer = self.review_serializer(data=self.valid_data)
-        with self.assertRaises(ValidationError):
-            serializer.is_valid(raise_exception=True)
+    # def test_no_valid_data_bad_date(self) -> None:
+    #     """
+    #     Тестируем невалидные данные: плохой date.
+    #
+    #     :return: None.
+    #     """
+    #     self.valid_data["date"] = "".join(choices(ascii_letters, k=6))
+    #     serializer = self.review_serializer(data=self.valid_data)
+    #     with self.assertRaises(ValidationError):
+    #         serializer.is_valid(raise_exception=True)
+    #
+    # def test_no_valid_data_no_date(self) -> None:
+    #     """
+    #     Тестируем невалидные данные: нет date.
+    #
+    #     :return: None.
+    #     """
+    #     self.valid_data.pop("date")
+    #     serializer = self.review_serializer(data=self.valid_data)
+    #     with self.assertRaises(ValidationError):
+    #         serializer.is_valid(raise_exception=True)
 
     @classmethod
     def tearDownClass(cls) -> None:

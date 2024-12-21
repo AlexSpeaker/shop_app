@@ -15,7 +15,7 @@ class ReviewSerializer(serializers.ModelSerializer[Review]):
             "email": {"required": True},
             "text": {"required": True},
             "rate": {"required": True},
-            "date": {"required": True},
+            "date": {"read_only": True},
         }
 
     @staticmethod

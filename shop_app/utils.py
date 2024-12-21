@@ -110,7 +110,7 @@ def parser_query_params(query_params: QueryDict) -> Dict[str, Any]:
 T = TypeVar("T", bound=models.Model)
 
 
-def get_or_none(queryset: QuerySet[T, T], **kwargs: Any) -> T | None:
+def get_or_none(queryset: QuerySet[T], **kwargs: Any) -> T | None:
     """
     Функция вернёт объект модели, если такой будет найден, иначе None.
 

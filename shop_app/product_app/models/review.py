@@ -22,7 +22,9 @@ class Review(models.Model):
         Product, on_delete=models.CASCADE, related_name="reviews"
     )
     text = models.TextField(_("text"), null=False, blank=False, max_length=5000)
-    date = models.DateTimeField(_("created at"), null=False, blank=False)
+    date = models.DateTimeField(
+        _("created at"), null=False, blank=False, auto_now_add=True
+    )
     rate = models.IntegerField(
         _("rate"),
         null=False,

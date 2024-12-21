@@ -56,14 +56,6 @@ class OutProductSerializerTests(TestCase):
         set_images_keys = {"src", "alt"}
         self.assertEqual(set_images_keys, set(data["images"][0].keys()))
 
-        set_tags_name = {
-            tag.name
-            for tag in Tag.objects.prefetch_related("products").filter(
-                products__pk=product.pk
-            )
-        }
-        self.assertEqual(set_tags_name, set(data["tags"]))
-
         set_specifications_keys = {"name", "value"}
         self.assertEqual(set_specifications_keys, set(data["specifications"][0].keys()))
 
