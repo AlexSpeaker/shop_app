@@ -22,7 +22,7 @@ class CatalogPopularAPIView(APIView):
     @extend_schema(
         request=None,
         responses=OutCatalogProductSerializer(many=True),
-        description="Получение топ 4 популярных продуктов во всём каталоге.",
+        description=f"Получение топ {limit} популярных продуктов во всём каталоге.",
         tags=("Catalog",),
     )
     def get(self, request: Request) -> Response:

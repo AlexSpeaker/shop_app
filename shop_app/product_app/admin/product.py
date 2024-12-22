@@ -82,7 +82,7 @@ class ProductSaleInline(SaleTabularInline):
 
     model = Sale
     verbose_name_plural = _("Sales")
-    extra = 0
+    extra = 1
     formset = CustomInlineFormSet
     fields = ("created_at", "date_from", "date_to", "price", "sale_price", "relevant")
     readonly_fields = ("created_at", "relevant")
