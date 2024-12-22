@@ -6,6 +6,7 @@ class ReviewSerializer(serializers.ModelSerializer[Review]):
     """
     Serializer для модели Review.
     """
+    date = serializers.DateTimeField(read_only=True, format="%Y-%m-%d %H:%M")
 
     class Meta:
         model = Review
@@ -15,7 +16,6 @@ class ReviewSerializer(serializers.ModelSerializer[Review]):
             "email": {"required": True},
             "text": {"required": True},
             "rate": {"required": True},
-            "date": {"read_only": True},
         }
 
     @staticmethod
