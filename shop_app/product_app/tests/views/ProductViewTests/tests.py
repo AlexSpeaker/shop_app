@@ -1,13 +1,12 @@
 from random import choice
 
 from django.urls import reverse
+from product_app.models import Category, Product, SubCategory, Tag
+from product_app.serializers.product import OutProductSerializer
+from product_app.tests.utils import get_product
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APITestCase
-
-from product_app.models import Tag, Product, SubCategory, Category
-from product_app.serializers.product import OutProductSerializer
-from product_app.tests.utils import get_product
 
 
 class ProductViewTests(APITestCase):
@@ -17,13 +16,14 @@ class ProductViewTests(APITestCase):
 
     url_view_name = "product_app:product"
     product_serializer = OutProductSerializer
-    @classmethod
-    def setUpClass(cls):
-        """
-       Подготовка к тестам.
 
-       :return: None.
-       """
+    @classmethod
+    def setUpClass(cls) -> None:
+        """
+        Подготовка к тестам.
+
+        :return: None.
+        """
         super().setUpClass()
         cls.list_products = [get_product(), get_product()]
 
@@ -34,13 +34,13 @@ class ProductViewTests(APITestCase):
         :return:
         """
         for product in self.list_products:
-            url = reverse(self.url_view_name, kwargs={'product_id': product.pk})
+            url = reverse(self.url_view_name, kwargs={"product_id": product.pk})
 
             response: Response = self.client.get(url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             serializer = OutProductSerializer(product)
             self.assertEqual(response.data, serializer.data)
-            self.assertEqual(response.data['id'], product.pk)
+            self.assertEqual(response.data["id"], product.pk)
 
     def test_product_reviews(self) -> None:
         """
@@ -50,11 +50,13 @@ class ProductViewTests(APITestCase):
         :return: None.
         """
         product = choice(self.list_products)
-        url = reverse(self.url_view_name, kwargs={'product_id': product.pk})
+        url = reverse(self.url_view_name, kwargs={"product_id": product.pk})
         response: Response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['reviews'][0]['author'], product.reviews.all()[0].author)
-        self.assertEqual(len(response.data['reviews']), product.reviews.all().count())
+        self.assertEqual(
+            response.data["reviews"][0]["author"], product.reviews.all()[0].author
+        )
+        self.assertEqual(len(response.data["reviews"]), product.reviews.all().count())
 
     def test_product_specifications(self) -> None:
         """
@@ -64,11 +66,16 @@ class ProductViewTests(APITestCase):
         :return: None.
         """
         product = choice(self.list_products)
-        url = reverse(self.url_view_name, kwargs={'product_id': product.pk})
+        url = reverse(self.url_view_name, kwargs={"product_id": product.pk})
         response: Response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['specifications'][0]['name'], product.specifications.all()[0].name)
-        self.assertEqual(len(response.data['specifications']), product.specifications.all().count())
+        self.assertEqual(
+            response.data["specifications"][0]["name"],
+            product.specifications.all()[0].name,
+        )
+        self.assertEqual(
+            len(response.data["specifications"]), product.specifications.all().count()
+        )
 
     def test_product_tags(self) -> None:
         """
@@ -78,12 +85,11 @@ class ProductViewTests(APITestCase):
         :return: None.
         """
         product = choice(self.list_products)
-        url = reverse(self.url_view_name, kwargs={'product_id': product.pk})
+        url = reverse(self.url_view_name, kwargs={"product_id": product.pk})
         response: Response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['tags'][0]['name'], product.tags.all()[0].name)
-        self.assertEqual(len(response.data['tags']), product.tags.all().count())
-
+        self.assertEqual(response.data["tags"][0]["name"], product.tags.all()[0].name)
+        self.assertEqual(len(response.data["tags"]), product.tags.all().count())
 
     @classmethod
     def tearDownClass(cls) -> None:

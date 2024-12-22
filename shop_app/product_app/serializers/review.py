@@ -6,6 +6,7 @@ class ReviewSerializer(serializers.ModelSerializer[Review]):
     """
     Serializer для модели Review.
     """
+
     date = serializers.DateTimeField(read_only=True, format="%Y-%m-%d %H:%M")
 
     class Meta:

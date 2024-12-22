@@ -7,7 +7,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
 
-class CategoryListView(ListAPIView[Category]):
+class CategoryListAPIView(ListAPIView[Category]):
     """
     Класс ListAPIView для модели Category.
     """
