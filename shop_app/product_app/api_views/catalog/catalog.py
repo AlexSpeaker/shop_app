@@ -66,7 +66,7 @@ class CatalogAPIView(APIView):
                 "currentPage", int, description="Номер текущей страницы.", required=True
             ),
             OpenApiParameter(
-                "category", int, description="ID категории продукта.", required=True
+                "category", int, description="ID категории продукта.", required=False
             ),
             OpenApiParameter(
                 "sort",

@@ -16,7 +16,8 @@ def get_catalog_filters(data: Dict[str, Any]) -> Q:
     filter_params &= Q(free_delivery=filter_data["freeDelivery"])
     filter_params &= Q(count__gt=0) if filter_data["available"] else Q(count=0)
     # А также учитываем категорию и не архивированные продукты.
-    filter_params &= Q(category__id=data["category"])
+    if data.get("category"):
+        filter_params &= Q(category__id=data["category"])
     filter_params &= Q(archived=False)
     # Если есть tags, то их тоже учитываем.
     tags_list = data.get("tags")

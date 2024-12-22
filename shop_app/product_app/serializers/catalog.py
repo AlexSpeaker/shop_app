@@ -66,7 +66,7 @@ class InCatalogSerializer(serializers.Serializer[Dict[str, Any]]):
     filter = InFilterSerializer(allow_null=False, required=True)
 
     currentPage = serializers.IntegerField(allow_null=False, required=True, min_value=1)
-    category = serializers.IntegerField(allow_null=False, required=True, min_value=1)
+    category = serializers.IntegerField(allow_null=False, min_value=1, required=False)
     sort = serializers.ChoiceField(
         choices=[
             ("rating", "rating"),

@@ -117,16 +117,6 @@ class InCatalogSerializerTests(TestCase):
             with self.assertRaises(ValidationError):
                 serializer.is_valid(raise_exception=True)
 
-    def test_invalid_data_no_category(self) -> None:
-        """
-        Тестируем невалидные данные: нет category.
-
-        :return: None.
-        """
-        self.valid_data.pop("category")
-        serializer = self.in_catalog_serializer(data=self.valid_data)
-        with self.assertRaises(ValidationError):
-            serializer.is_valid(raise_exception=True)
 
     def test_invalid_data_bad_sort(self) -> None:
         """
