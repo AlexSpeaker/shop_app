@@ -130,8 +130,14 @@ class CatalogAPIView(APIView):
                     output_field=DecimalField(),
                 ),
                 # Добавим недостающие поля для продуктов (для сортировки).
-                rating=Avg("reviews__rate"),
                 reviews_count=Count("reviews"),
+                rating=Case(
+                    # Если отзывы есть, то считаем среднее значение рейтинга.
+                    When(reviews_count__gt=0, then=Avg("reviews__rate")),
+                    # Иначе 0.
+                    default=0,
+                    output_field=DecimalField(),
+                ),
             )
             .filter(
                 # Фильтруем по заданным параметрам.

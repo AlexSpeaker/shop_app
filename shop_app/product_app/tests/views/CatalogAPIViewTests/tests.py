@@ -155,7 +155,7 @@ class CatalogAPIViewTests(APITestCase):
 
         :return: None.
         """
-        for product in self.list_products_cat_1:
+        for product in self.list_products_cat_1[:-1]:
             for _ in range(20):
                 get_review(product)
 
