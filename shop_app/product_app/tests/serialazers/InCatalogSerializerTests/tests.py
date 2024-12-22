@@ -117,7 +117,6 @@ class InCatalogSerializerTests(TestCase):
             with self.assertRaises(ValidationError):
                 serializer.is_valid(raise_exception=True)
 
-
     def test_invalid_data_bad_sort(self) -> None:
         """
         Тестируем невалидные данные: плохой sort.

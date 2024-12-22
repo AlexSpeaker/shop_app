@@ -2,8 +2,11 @@ from decimal import Decimal
 from typing import Any, Dict
 
 from django.core.paginator import Page
-from product_app.models import Product
-from product_app.serializers.product import OutCatalogProductSerializer
+from product_app.models import Product, Sale
+from product_app.serializers.product import (
+    OutCatalogProductSerializer,
+    OutCatalogSaleProductSerializer,
+)
 from rest_framework import serializers
 
 
@@ -83,3 +86,23 @@ class InCatalogSerializer(serializers.Serializer[Dict[str, Any]]):
     tags = serializers.ListField(
         required=False, allow_empty=False, child=serializers.IntegerField(min_value=1)
     )
+
+
+class InCurrentPageSerializer(serializers.Serializer[Dict[str, Any]]):
+    """
+    Serializer для текущей страницы.
+    """
+
+    currentPage = serializers.IntegerField(allow_null=False, required=True, min_value=1)
+
+
+class OutCatalogSalesSerializer(serializers.Serializer[Page[Sale]]):
+    """
+    Serializer каталога исходящих данных (продукты с действующей акцией).
+    """
+
+    items = OutCatalogSaleProductSerializer(
+        many=True, read_only=True, source="object_list"
+    )
+    currentPage = serializers.IntegerField(read_only=True, source="number")
+    lastPage = serializers.IntegerField(read_only=True, source="paginator.num_pages")

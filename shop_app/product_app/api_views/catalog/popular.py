@@ -1,6 +1,5 @@
 from django.db.models import Avg, Case, Count, DecimalField, When
 from drf_spectacular.utils import extend_schema
-
 from product_app.models import Product
 from product_app.serializers.product import OutCatalogProductSerializer
 from rest_framework.request import Request

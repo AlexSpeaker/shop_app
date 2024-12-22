@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import Optional
 
-from product_app.models import Product, ProductImage, Specification
+from product_app.models import Product, ProductImage, Sale, Specification
 from product_app.serializers.review import ReviewSerializer
 from product_app.serializers.tag import OutTagSerializer
 from rest_framework import serializers
@@ -183,3 +183,28 @@ class OutCatalogProductSerializer(serializers.ModelSerializer[Product]):
         """
 
         return obj.get_rating()
+
+
+class OutCatalogSaleProductSerializer(serializers.ModelSerializer[Sale]):
+    """
+    Serializer для продуктов с действующей акцией. (для каталога).
+    """
+
+    id = serializers.IntegerField(read_only=True, source="product.pk")
+    salePrice = serializers.DecimalField(
+        read_only=True,
+        source="sale_price",
+        decimal_places=2,
+        max_digits=10,
+        min_value=0,
+    )
+    dateFrom = serializers.DateField(read_only=True, source="date_from", format="%m-%d")
+    dateTo = serializers.DateField(read_only=True, source="date_to", format="%m-%d")
+    title = serializers.CharField(read_only=True, source="product.title")
+    images = OutProductImageSerializer(
+        many=True, read_only=True, source="product.images"
+    )
+
+    class Meta:
+        model = Sale
+        fields = ("id", "price", "salePrice", "dateFrom", "dateTo", "title", "images")

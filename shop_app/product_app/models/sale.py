@@ -1,8 +1,8 @@
-from datetime import date
-
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import Q
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from product_app.models import Product
 
@@ -66,7 +66,10 @@ class Sale(models.Model):
                 }
             )
         if not self.pk:
-            sales = Sale.objects.filter(date_to__gte=date.today()).count()
+            sales = Sale.objects.filter(
+                Q(date_from__lte=timezone.now().date())
+                & Q(date_to__gte=timezone.now().date())
+            ).count()
             if sales:
                 raise ValidationError(
                     {
