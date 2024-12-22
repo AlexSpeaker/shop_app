@@ -37,7 +37,6 @@ class ProductReviewsViewTests(APITestCase):
 
         :return: None.
         """
-        # "author", "email", "text", "rate"
         self.valid_data = {
             "author": "".join(choices(ascii_letters, k=6)),
             "email": f'{"".join(choices(ascii_letters, k=6))}@{"".join(choices(ascii_letters, k=6))}.com',
@@ -87,6 +86,8 @@ class ProductReviewsViewTests(APITestCase):
         self.valid_data['email'] = ''.join(choices(ascii_letters, k=6))
         response: Response = self.client.post(self.url, data=self.valid_data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        reviews = Review.objects.filter(product=self.product)
+        self.assertEqual(reviews.count(), 0)
 
     @classmethod
     def tearDownClass(cls) -> None:
