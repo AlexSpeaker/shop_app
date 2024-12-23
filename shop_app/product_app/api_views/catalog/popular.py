@@ -41,5 +41,5 @@ class CatalogPopularAPIView(APIView):
                 default=0,
                 output_field=DecimalField(),
             ),
-        ).order_by("-rating")[: self.limit]
+        ).filter(archived=False).order_by("-rating")[: self.limit]
         return Response(self.product_serializer(products, many=True).data)

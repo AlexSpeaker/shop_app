@@ -436,6 +436,21 @@ class CatalogAPIViewTests(APITestCase):
         self.assertFalse(id_first_product == sale_product.id)
         self.assertTrue(id_first_product == self.list_products_cat_1[0].id)
 
+    def test_archived_products(self) -> None:
+        """
+        Проверим, чтобы в выдаче не было архивированных продуктов.
+        :return:
+        """
+
+        for product in self.list_products_cat_1:
+            product.archived = True
+        Product.objects.bulk_update(self.list_products_cat_1, ["archived"])
+        response: Response = self.client.get(self.url, data=self.valid_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["items"]), 0)
+
+
+
     def tearDown(self) -> None:
         """
         Функция удаляет продукты после каждого теста.

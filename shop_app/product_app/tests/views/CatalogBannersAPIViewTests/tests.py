@@ -59,6 +59,28 @@ class CatalogBannersAPIViewTests(APITestCase):
         }
         self.assertEqual(set(response_1.data[0].keys()), set_keys)
 
+    def test_archived_products(self) -> None:
+        """
+        Проверим, чтобы в выдаче не было архивированных продуктов.
+        :return:
+        """
+
+        for product in self.products[:-1]:
+            product.archived = True
+        Product.objects.bulk_update(self.products, ["archived"])
+        response: Response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def tearDown(self) -> None:
+        """
+        Возвращаем продуктам archived = False
+
+        :return: None.
+        """
+        for product in self.products:
+            product.archived = False
+        Product.objects.bulk_update(self.products, ["archived"])
 
     @classmethod
     def tearDownClass(cls) -> None:

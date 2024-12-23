@@ -1,3 +1,4 @@
+from django.db.models import Q
 from drf_spectacular.utils import extend_schema
 from product_app.models import Product
 from product_app.serializers.product import OutCatalogProductSerializer
@@ -31,5 +32,5 @@ class CatalogLimitedAPIView(APIView):
         :param request: Request.
         :return: Response.
         """
-        products = self.queryset.filter(count__lte=self.count)[: self.limit]
+        products = self.queryset.filter(Q(count__lte=self.count) & Q(archived=False))[:self.limit]
         return Response(self.product_serializer(products, many=True).data)

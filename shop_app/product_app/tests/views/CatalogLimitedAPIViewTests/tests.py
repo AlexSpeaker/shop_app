@@ -48,6 +48,29 @@ class CatalogLimitedAPIViewTests(APITestCase):
         set_ids_in_response = {product["id"] for product in response.data}
         self.assertTrue(set_ids_in_response.issubset(set_ids_limit_products))
 
+    def test_archived_products(self) -> None:
+        """
+        Проверим, чтобы в выдаче не было архивированных продуктов.
+        :return:
+        """
+        for product in self.products_limit[:-1]:
+            product.archived = True
+        Product.objects.bulk_update(self.products_limit, ["archived"])
+        response: Response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(response.data), 1)
+
+    def tearDown(self) -> None:
+        """
+        Возвращаем продуктам archived = False
+
+        :return: None.
+        """
+        for product in self.products_limit:
+            product.archived = False
+        Product.objects.bulk_update(self.products_limit, ["archived"])
+
     @classmethod
     def tearDownClass(cls) -> None:
         """

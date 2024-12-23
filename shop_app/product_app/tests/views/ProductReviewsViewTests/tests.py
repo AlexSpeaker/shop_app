@@ -93,6 +93,25 @@ class ProductReviewsViewTests(APITestCase):
         reviews = Review.objects.filter(product=self.product)
         self.assertEqual(reviews.count(), 0)
 
+    def test_archived_product(self) -> None:
+        """
+        Проверяем с архивированным продуктом.
+
+        :return:
+        """
+        self.product.archived = True
+        self.product.save()
+        response: Response = self.client.post(self.url, data=self.valid_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def tearDown(self) -> None:
+        """
+        Что бы избежать возможные ошибки, возвращаем продукту archived = False.
+        :return: None.
+        """
+        self.product.archived = False
+        self.product.save()
+
     @classmethod
     def tearDownClass(cls) -> None:
         """

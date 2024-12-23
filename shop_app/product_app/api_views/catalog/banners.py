@@ -30,5 +30,5 @@ class CatalogBannersAPIView(APIView):
         :param request: Request.
         :return: Response.
         """
-        products = self.queryset.order_by("?")[: self.limit]
+        products = self.queryset.filter(archived=False).order_by("?")[: self.limit]
         return Response(self.product_serializer(products, many=True).data)

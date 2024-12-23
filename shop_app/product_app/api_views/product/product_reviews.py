@@ -35,7 +35,7 @@ class ProductReviewsView(APIView):
         """
 
         product = get_or_none(self.queryset, id=product_id)
-        if not product:
+        if not product or product.archived:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.review_serializer(data=request.data)

@@ -55,6 +55,7 @@ class CatalogSalesAPIView(APIView):
         sales = self.queryset.filter(
             Q(date_from__lte=timezone.now().date())
             & Q(date_to__gte=timezone.now().date())
+            & Q(product__archived=False)
         ).order_by("date_to")
         paginator = Paginator(sales, self.limit_on_page)
         page_odj = paginator.get_page(

@@ -91,6 +91,21 @@ class ProductViewTests(APITestCase):
         self.assertEqual(response.data["tags"][0]["name"], product.tags.all()[0].name)
         self.assertEqual(len(response.data["tags"]), product.tags.all().count())
 
+    def test_archived_product(self) -> None:
+        """
+        Проверяем с архивированным продуктом.
+
+        :return:
+        """
+        product = choice(self.list_products)
+        product.archived = True
+        product.save()
+        url = reverse(self.url_view_name, kwargs={"product_id": product.pk})
+        response: Response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        product.archived = False
+        product.save()
+
     @classmethod
     def tearDownClass(cls) -> None:
         """
