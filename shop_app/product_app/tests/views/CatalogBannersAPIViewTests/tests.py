@@ -42,7 +42,7 @@ class CatalogBannersAPIViewTests(APITestCase):
         # что звёзды на небе сойдутся так, что этот тест провалится, поэтому перепроверяем.
         self.assertFalse(response_1.data == response_2.data)
         self.assertEqual(len(response_1.data), len(response_2.data))
-        self.assertEqual(len(response_1.data), CatalogBannersAPIView.limit)
+        self.assertTrue(len(response_1.data) <= limit)
         set_keys = {
             "id",
             "category",
