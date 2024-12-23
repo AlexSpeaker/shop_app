@@ -1,4 +1,4 @@
-from random import choice, choices
+from random import choice, randint
 
 from django.urls import reverse
 from product_app.api_views.catalog.limited import CatalogLimitedAPIView
@@ -34,10 +34,14 @@ class CatalogLimitedAPIViewTests(APITestCase):
         cls.products = [
             get_simple_product(choice(cls.sub_categories)) for _ in range(10)
         ]
-        cls.products_limit = choices(cls.products, k=5)
-        for product in cls.products_limit:
-            product.count = cls.product_limit_count - 1
-        Product.objects.bulk_update(cls.products_limit, ["count"])
+        cls.products_limit = []
+        for product in cls.products:
+            if randint(0, 1) == 0:
+                product.count = cls.product_limit_count - 1
+                cls.products_limit.append(product)
+            else:
+                product.limit = cls.product_limit_count + 1
+        Product.objects.bulk_update(cls.products, ["count"])
 
     def test_get_limit_products(self) -> None:
         """
