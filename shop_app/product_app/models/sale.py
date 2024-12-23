@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -28,7 +30,7 @@ class Sale(models.Model):
         decimal_places=2,
         null=False,
         blank=False,
-        validators=[MinValueValidator(1)],
+        validators=[MinValueValidator(Decimal(1))],
     )
     sale_price = models.DecimalField(
         _("sale price"),
@@ -36,7 +38,7 @@ class Sale(models.Model):
         decimal_places=2,
         null=False,
         blank=False,
-        validators=[MinValueValidator(1)],
+        validators=[MinValueValidator(Decimal(1))],
     )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 

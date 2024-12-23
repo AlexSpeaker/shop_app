@@ -196,7 +196,7 @@ class OutCatalogSaleProductSerializer(serializers.ModelSerializer[Sale]):
         source="sale_price",
         decimal_places=2,
         max_digits=10,
-        min_value=0,
+        min_value=Decimal("0"),
     )
     dateFrom = serializers.DateField(read_only=True, source="date_from", format="%m-%d")
     dateTo = serializers.DateField(read_only=True, source="date_to", format="%m-%d")
