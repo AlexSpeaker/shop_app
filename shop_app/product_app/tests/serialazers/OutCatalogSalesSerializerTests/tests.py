@@ -65,12 +65,20 @@ class OutCatalogSalesSerializerTests(TestCase):
         self.assertEqual(set_sale_keys, set(data["items"][0].keys()))
         set_keys = {"items", "currentPage", "lastPage"}
         self.assertEqual(set_keys, set(data.keys()))
-        self.assertEqual(data["items"][0]['id'], self.product_1.id)
-        self.assertAlmostEqual(float(data["items"][0]['price']), self.sale_1.price, places=2)
-        self.assertAlmostEqual(float(data["items"][0]['salePrice']), self.sale_1.sale_price, places=2)
-        self.assertEqual(data["items"][0]['dateFrom'], self.sale_1.date_from.strftime("%m-%d"))
-        self.assertEqual(data["items"][0]['dateTo'], self.sale_1.date_to.strftime("%m-%d"))
-        self.assertEqual(data["items"][0]['title'], self.product_1.title)
+        self.assertEqual(data["items"][0]["id"], self.product_1.id)
+        self.assertAlmostEqual(
+            float(data["items"][0]["price"]), self.sale_1.price, places=2
+        )
+        self.assertAlmostEqual(
+            float(data["items"][0]["salePrice"]), self.sale_1.sale_price, places=2
+        )
+        self.assertEqual(
+            data["items"][0]["dateFrom"], self.sale_1.date_from.strftime("%m-%d")
+        )
+        self.assertEqual(
+            data["items"][0]["dateTo"], self.sale_1.date_to.strftime("%m-%d")
+        )
+        self.assertEqual(data["items"][0]["title"], self.product_1.title)
 
     @classmethod
     def tearDownClass(cls) -> None:
