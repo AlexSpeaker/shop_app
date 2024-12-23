@@ -32,14 +32,18 @@ class CatalogPopularAPIView(APIView):
         :return: Response.
         """
 
-        products = self.queryset.annotate(
-            reviews_count=Count("reviews"),
-            rating=Case(
-                # Если отзывы есть, то считаем среднее значение рейтинга.
-                When(reviews_count__gt=0, then=Avg("reviews__rate")),
-                # Иначе 0.
-                default=0,
-                output_field=DecimalField(),
-            ),
-        ).filter(archived=False).order_by("-rating")[: self.limit]
+        products = (
+            self.queryset.annotate(
+                reviews_count=Count("reviews"),
+                rating=Case(
+                    # Если отзывы есть, то считаем среднее значение рейтинга.
+                    When(reviews_count__gt=0, then=Avg("reviews__rate")),
+                    # Иначе 0.
+                    default=0,
+                    output_field=DecimalField(),
+                ),
+            )
+            .filter(archived=False)
+            .order_by("-rating")[: self.limit]
+        )
         return Response(self.product_serializer(products, many=True).data)

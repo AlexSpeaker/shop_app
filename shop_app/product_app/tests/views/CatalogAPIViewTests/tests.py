@@ -449,8 +449,6 @@ class CatalogAPIViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["items"]), 0)
 
-
-
     def tearDown(self) -> None:
         """
         Функция удаляет продукты после каждого теста.

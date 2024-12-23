@@ -1,19 +1,19 @@
 from random import choice
 
 from django.urls import reverse
+from product_app.api_views.catalog.banners import CatalogBannersAPIView
+from product_app.models import Category, Product, SubCategory
+from product_app.tests.utils import get_category, get_simple_product, get_sub_category
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APITestCase
-
-from product_app.api_views.catalog.banners import CatalogBannersAPIView
-from product_app.models import Product, SubCategory, Category
-from product_app.tests.utils import get_category, get_sub_category, get_simple_product
 
 
 class CatalogBannersAPIViewTests(APITestCase):
     """
     Тест CatalogBannersAPIView.
     """
+
     url = reverse("product_app:banners")
 
     @classmethod
@@ -25,8 +25,13 @@ class CatalogBannersAPIViewTests(APITestCase):
         """
         super().setUpClass()
         cls.category = get_category()
-        cls.sub_categories = [get_sub_category(cls.category), get_sub_category(cls.category)]
-        cls.products = [get_simple_product(choice(cls.sub_categories)) for _ in range(10)]
+        cls.sub_categories = [
+            get_sub_category(cls.category),
+            get_sub_category(cls.category),
+        ]
+        cls.products = [
+            get_simple_product(choice(cls.sub_categories)) for _ in range(10)
+        ]
 
     def test_get_banners(self) -> None:
         """
