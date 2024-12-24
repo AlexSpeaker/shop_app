@@ -1,7 +1,6 @@
 from datetime import timedelta
 from random import choice, choices, randint
 
-from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 from product_app.api_views.catalog.sales import CatalogSalesAPIView
