@@ -21,7 +21,11 @@ class Basket(models.Model):
         Product, on_delete=models.CASCADE, related_name="baskets"
     )
     count = models.IntegerField(
-        _("count"), validators=[MinValueValidator(1)], null=False, blank=False, default=0
+        _("count"),
+        validators=[MinValueValidator(1)],
+        null=False,
+        blank=False,
+        default=0,
     )
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="baskets", null=True, default=None

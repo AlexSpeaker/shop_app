@@ -3,7 +3,7 @@ import os
 import re
 import uuid
 from json import JSONDecodeError
-from typing import Any, Dict, TypeVar, Optional
+from typing import Any, Dict, Optional, TypeVar
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
@@ -126,21 +126,23 @@ def get_or_none(queryset: QuerySet[T], **kwargs: Any) -> T | None:
         return None
     return obj
 
-def get_or_create_anonymous_session_id(request: Request) -> Optional[str]:
+
+def get_or_create_anonymous_user_id(request: Request) -> Optional[str]:
     """
-    Вернёт уникальный anonymous_session_id для анонимного пользователя.
+    Вернёт уникальный anonymous_user_id для анонимного пользователя.
     Если его не существует, то создаст его.
     В случае, если пользователь прошёл аутентификацию, то вернёт None.
 
     :param request: Request.
-    :return: Уникальный anonymous_session_id,
+    :return: Уникальный anonymous_user_id,
         если пользователь не прошёл аутентификацию, иначе None.
     """
+
     if request.user.is_authenticated:
         return None
-    anonymous_session_id = request.session.get("anonymous_session_id")
+    anonymous_session_id = request.session.get("anonymous_user_id", None)
     if anonymous_session_id:
-        return anonymous_session_id
-    anonymous_session_id = uuid.uuid4().hex
-    request.session["anonymous_session_id"] = anonymous_session_id
-    return anonymous_session_id
+        return str(anonymous_session_id)
+    session_id = uuid.uuid4().hex
+    request.session["anonymous_user_id"] = session_id
+    return session_id

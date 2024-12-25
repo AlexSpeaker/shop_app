@@ -1,6 +1,5 @@
 from django.db import transaction
 from django.db.models import Q
-
 from order_app.models import Basket
 from order_app.serializers.basket import InBasketSerializer, OutBasketSerializer
 from rest_framework import status
@@ -8,7 +7,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from utils import get_or_create_anonymous_session_id
+from utils import get_or_create_anonymous_user_id
 
 
 class BasketAPIView(APIView):
@@ -31,14 +30,17 @@ class BasketAPIView(APIView):
         :param request: Request.
         :return: Response.
         """
+        user = request.user if request.user.is_authenticated else None
+        anonymous_user_id = get_or_create_anonymous_user_id(request)
+
         with transaction.atomic():
             serializer_in = self.basket_in_serializer(data=request.data)
             if not serializer_in.is_valid():
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             product, count = serializer_in.validated_data
-            user = request.user if request.user.is_authenticated else None
-            anonymous_session_id = get_or_create_anonymous_session_id(request)
-            basket, _ = Basket.objects.get_or_create(user=user, product=product, session_id=anonymous_session_id)
+            basket, _ = Basket.objects.get_or_create(
+                user=user, product=product, session_id=anonymous_user_id
+            )
             basket.count += count
             basket.save()
             product.count -= count
@@ -49,3 +51,4 @@ class BasketAPIView(APIView):
         )
 
         return Response(self.basket_out_serializer(all_baskets, many=True).data)
+
