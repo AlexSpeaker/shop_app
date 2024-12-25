@@ -173,13 +173,12 @@ class OutCatalogProductSerializer(serializers.ModelSerializer[Product]):
         return int(obj.reviews.count())
 
     @staticmethod
-    def get_rating(obj: Product) -> Optional[float]:
+    def get_rating(obj: Product) -> float:
         """
         Функция определит средний рейтинг продукта.
-        Если рейтинга ещё нет - вернёт None.
 
         :param obj: Product.
-        :return: Optional[float].
+        :return: Средний рейтинг продукта.
         """
 
         return obj.get_rating()
