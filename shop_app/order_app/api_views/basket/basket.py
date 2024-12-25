@@ -47,8 +47,22 @@ class BasketAPIView(APIView):
             product.save()
 
         all_baskets = self.queryset.filter(
-            Q(user=basket.user) & Q(session_id=basket.session_id)
+            Q(user=user) & Q(session_id=anonymous_user_id)
         )
 
         return Response(self.basket_out_serializer(all_baskets, many=True).data)
 
+    def get(self, request: Request) -> Response:
+        """
+        Получение списка корзин.
+
+        :param request: Request.
+        :return: Response.
+        """
+        user = request.user if request.user.is_authenticated else None
+        anonymous_user_id = get_or_create_anonymous_user_id(request)
+        all_baskets = self.queryset.filter(
+            Q(user=user) & Q(session_id=anonymous_user_id)
+        )
+
+        return Response(self.basket_out_serializer(all_baskets, many=True).data)
