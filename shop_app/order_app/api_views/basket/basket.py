@@ -1,12 +1,14 @@
 from django.db import transaction
 from django.db.models import Q
-from order_app.api_views.utils import get_basket
+
 from order_app.models import Basket
 from order_app.serializers.basket import InBasketSerializer, OutBasketSerializer
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from utils import get_or_create_anonymous_session_id
 
 
 class BasketAPIView(APIView):
@@ -34,7 +36,10 @@ class BasketAPIView(APIView):
             if not serializer_in.is_valid():
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             product, count = serializer_in.validated_data
-            basket = get_basket(request, product, count)
+            user = request.user if request.user.is_authenticated else None
+            anonymous_session_id = get_or_create_anonymous_session_id(request)
+            basket, _ = Basket.objects.get_or_create(user=user, product=product, session_id=anonymous_session_id)
+            basket.count += count
             basket.save()
             product.count -= count
             product.save()
