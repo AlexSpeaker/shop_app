@@ -106,3 +106,12 @@ class OutBasketSerializer(serializers.ModelSerializer[Basket]):
         """
         rating: float = obj.product.get_rating()
         return rating
+
+
+class InDeleteBasketSerializer(serializers.Serializer[Dict[str, Any]]):
+    """
+    Serializer Basket входящих данных (удаление корзины).
+    """
+
+    id = serializers.IntegerField(min_value=1, required=True, write_only=True)
+    count = serializers.IntegerField(min_value=1, required=True, write_only=True)

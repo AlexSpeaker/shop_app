@@ -31,3 +31,4 @@ class Basket(models.Model):
         User, on_delete=models.CASCADE, related_name="baskets", null=True, default=None
     )
     session_id = models.CharField(null=True, default=None)
+    created_at = models.DateField(auto_now_add=True)
