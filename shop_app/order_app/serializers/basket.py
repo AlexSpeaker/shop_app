@@ -79,10 +79,13 @@ class OutBasketSerializer(serializers.ModelSerializer[Basket]):
     def get_price(obj: Basket) -> Decimal:
         """
         Определит текущую цену на продукт (учитывает действующую акцию).
+        Если покупка уже совершена, то вернёт цену по которой была совершена покупка.
 
         :param obj: Product.
         :return: Цена.
         """
+        if obj.fixed_price:
+            return obj.fixed_price
         actual_price: Decimal = obj.product.get_actual_price()
         return actual_price
 

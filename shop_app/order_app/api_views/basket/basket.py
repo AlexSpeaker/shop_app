@@ -44,7 +44,7 @@ class BasketAPIView(APIView):
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             product, count = serializer_in.validated_data
             basket, _ = Basket.objects.get_or_create(
-                user=user, product=product, session_id=anonymous_user_id
+                user=user, product=product, session_id=anonymous_user_id, order=None
             )
             basket.count += count
             basket.save()
@@ -52,7 +52,7 @@ class BasketAPIView(APIView):
             product.save()
 
         all_baskets = self.queryset.filter(
-            Q(user=user) & Q(session_id=anonymous_user_id)
+            Q(user=user) & Q(session_id=anonymous_user_id) & Q(order=None)
         )
 
         return Response(self.basket_out_serializer(all_baskets, many=True).data)
@@ -67,7 +67,7 @@ class BasketAPIView(APIView):
         user = request.user if request.user.is_authenticated else None
         anonymous_user_id = get_or_create_anonymous_user_id(request)
         all_baskets = self.queryset.filter(
-            Q(user=user) & Q(session_id=anonymous_user_id)
+            Q(user=user) & Q(session_id=anonymous_user_id) & Q(order=None)
         )
 
         return Response(self.basket_out_serializer(all_baskets, many=True).data)
@@ -95,7 +95,10 @@ class BasketAPIView(APIView):
             basket: Basket = (
                 self.queryset.select_for_update()
                 .filter(
-                    Q(product=product) & Q(user=user) & Q(session_id=anonymous_user_id)
+                    Q(product=product)
+                    & Q(user=user)
+                    & Q(session_id=anonymous_user_id)
+                    & Q(order=None)
                 )
                 .first()
             )
@@ -111,7 +114,7 @@ class BasketAPIView(APIView):
                 basket.save()
                 product.save()
         all_baskets = self.queryset.filter(
-            Q(user=user) & Q(session_id=anonymous_user_id)
+            Q(user=user) & Q(session_id=anonymous_user_id) & Q(order=None)
         )
 
         return Response(self.basket_out_serializer(all_baskets, many=True).data)
