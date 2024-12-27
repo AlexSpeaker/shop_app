@@ -41,14 +41,21 @@ class TagAPIView(APIView):
         """
 
         category_id = request.query_params.get("category", None)
-        id_serializer = self.id_category_serializer(data={"category_id": category_id})
-        if not id_serializer.is_valid():
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if category_id:
+            id_serializer = self.id_category_serializer(data={"category_id": category_id})
+            if not id_serializer.is_valid():
+                return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        tags = (
-            self.queryset.filter(products__category_id=category_id)
-            .annotate(products_count=Count("products"))
-            .order_by("-products_count")[:10]
-        )
+            tags = (
+                self.queryset.filter(products__category_id=category_id)
+                .annotate(products_count=Count("products"))
+                .order_by("-products_count")[:10]
+            )
+        else:
+            tags = (
+                self.queryset.all()
+                .annotate(products_count=Count("products"))
+                .order_by("-products_count")[:10]
+            )
         serializer = self.tag_serializer(tags, many=True)
         return Response(serializer.data)

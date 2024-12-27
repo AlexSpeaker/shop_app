@@ -48,14 +48,6 @@ class TagAPIViewTests(APITestCase):
         response: Response = self.client.get(self.url, data={"category": "s"})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_get_tags_no_params(self) -> None:
-        """
-        Проверим, что TagAPIView возвращает ошибку, если нужные параметры отсутствуют.
-
-        :return: None.
-        """
-        response: Response = self.client.get(self.url, data={"cat": "1"})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_tags(self) -> None:
         """
