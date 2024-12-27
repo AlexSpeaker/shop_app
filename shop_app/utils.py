@@ -1,3 +1,4 @@
+import itertools
 import json
 import os
 import re
@@ -10,6 +11,10 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import QuerySet
 from django.http import QueryDict
+from drf_spectacular.drainage import warn
+from drf_spectacular.openapi import AutoSchema
+from drf_spectacular.plumbing import build_media_type_object
+from drf_spectacular.utils import OpenApiRequest
 from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
 
@@ -146,3 +151,69 @@ def get_or_create_anonymous_user_id(request: Request) -> Optional[str]:
     session_id = uuid.uuid4().hex
     request.session["anonymous_user_id"] = session_id
     return session_id
+
+
+class CustomAutoSchema(AutoSchema):
+    """
+    Так как фронт требует метод delete с request body,
+    а drf_spectacular нам это запрещает делать,
+    то переопределим метод _get_request_body.
+    Теперь этот класс будет показывать в документации api/schema/swagger-ui/
+    наш метод delete с request body.
+    """
+    def _get_request_body(self, direction="request"):
+        request_serializer = self.get_request_serializer()
+        request_body_required = True
+        content = []
+
+        # either implicit media-types via available parsers or manual list via decoration
+        if isinstance(request_serializer, dict):
+            media_types_iter = request_serializer.items()
+        else:
+            media_types_iter = zip(
+                self.map_parsers(), itertools.repeat(request_serializer)
+            )
+
+        for media_type, serializer in media_types_iter:
+            if isinstance(serializer, OpenApiRequest):
+                serializer, examples, encoding = (
+                    serializer.request,
+                    serializer.examples,
+                    serializer.encoding,
+                )
+            else:
+                encoding, examples = None, None
+
+            if (
+                encoding
+                and media_type != "application/x-www-form-urlencoded"
+                and not media_type.startswith("multipart")
+            ):
+                warn(
+                    'Encodings object on media types other than "application/x-www-form-urlencoded" '
+                    'or "multipart/*" have undefined behavior.'
+                )
+
+            examples = self._get_examples(
+                serializer, direction, media_type, None, examples
+            )
+            schema, partial_request_body_required = self._get_request_for_media_type(
+                serializer, direction
+            )
+
+            if schema is not None:
+                content.append((media_type, schema, examples, encoding))
+                request_body_required &= partial_request_body_required
+
+        if not content:
+            return None
+
+        request_body = {
+            "content": {
+                media_type: build_media_type_object(schema, examples, encoding)
+                for media_type, schema, examples, encoding in content
+            }
+        }
+        if request_body_required:
+            request_body["required"] = request_body_required
+        return request_body

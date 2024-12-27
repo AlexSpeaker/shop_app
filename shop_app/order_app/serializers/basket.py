@@ -1,8 +1,6 @@
 from decimal import Decimal
 from typing import Any, Dict
 
-from drf_spectacular.utils import extend_schema_serializer
-
 from order_app.models import Basket
 from product_app.models import Product
 from product_app.serializers.product import OutProductImageSerializer
@@ -112,9 +110,7 @@ class OutBasketSerializer(serializers.ModelSerializer[Basket]):
         rating: float = obj.product.get_rating()
         return rating
 
-@extend_schema_serializer(
-    component_name='InDeleteBasketSerializer'
-)
+
 class InDeleteBasketSerializer(serializers.Serializer[Dict[str, Any]]):
     """
     Serializer Basket входящих данных (удаление корзины).

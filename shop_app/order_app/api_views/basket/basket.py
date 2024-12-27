@@ -1,7 +1,5 @@
 from django.db import transaction
 from django.db.models import Q
-from drf_spectacular.openapi import AutoSchema
-from drf_spectacular.plumbing import ComponentRegistry
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from order_app.models import Basket
 from order_app.serializers.basket import (
@@ -14,27 +12,14 @@ from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from utils import get_or_create_anonymous_user_id
+from utils import CustomAutoSchema, get_or_create_anonymous_user_id
 
-class CustomAutoSchema(AutoSchema):
-    def get_operation(self, path: str, path_regex: str, path_prefix: str, method: str, registry: ComponentRegistry) -> dict:
-        operation = super().get_operation(path, path_regex, path_prefix, method, registry)
-        if method.lower() == 'delete':
-            operation['requestBody'] = {
-                'content': {
-                    'application/json': {
-                        'schema': {
-                            '$ref': '#/components/schemas/InDeleteBasketSerializer'
-                        }
-                    }
-                }
-            }
 
-        return operation
 class BasketAPIView(APIView):
     """
     Basket APIView
     """
+
     schema = CustomAutoSchema()
     basket_in_serializer = InBasketSerializer
     basket_in_delete_serializer = InDeleteBasketSerializer
@@ -105,6 +90,7 @@ class BasketAPIView(APIView):
         return Response(self.basket_out_serializer(all_baskets, many=True).data)
 
     @extend_schema(
+        request=InDeleteBasketSerializer,
         responses={
             200: OutBasketSerializer(many=True),
             400: OpenApiResponse(description="Неверный запрос."),
