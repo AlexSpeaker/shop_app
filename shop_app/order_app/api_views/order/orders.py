@@ -17,7 +17,16 @@ class OrderAPIView(APIView):
     Order APIView
     """
 
-    queryset = Order.objects.prefetch_related("baskets")
+    queryset = Order.objects.select_related("user").prefetch_related(
+        "baskets",
+        "baskets__product",
+        "baskets__product__category",
+        "baskets__user",
+        "baskets__product__tags",
+        "baskets__product__images",
+        "baskets__product__reviews",
+        "baskets__product__sales",
+    )
     order_out_serializer = OutOrderSerializer
 
     @staticmethod

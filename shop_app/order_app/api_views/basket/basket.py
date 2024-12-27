@@ -1,5 +1,8 @@
 from django.db import transaction
 from django.db.models import Q
+from drf_spectacular.openapi import AutoSchema
+from drf_spectacular.plumbing import ComponentRegistry
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from order_app.models import Basket
 from order_app.serializers.basket import (
     InBasketSerializer,
@@ -13,21 +16,44 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from utils import get_or_create_anonymous_user_id
 
+class CustomAutoSchema(AutoSchema):
+    def get_operation(self, path: str, path_regex: str, path_prefix: str, method: str, registry: ComponentRegistry) -> dict:
+        operation = super().get_operation(path, path_regex, path_prefix, method, registry)
+        if method.lower() == 'delete':
+            operation['requestBody'] = {
+                'content': {
+                    'application/json': {
+                        'schema': {
+                            '$ref': '#/components/schemas/InDeleteBasketSerializer'
+                        }
+                    }
+                }
+            }
 
+        return operation
 class BasketAPIView(APIView):
     """
     Basket APIView
     """
-
+    schema = CustomAutoSchema()
     basket_in_serializer = InBasketSerializer
     basket_in_delete_serializer = InDeleteBasketSerializer
     basket_out_serializer = OutBasketSerializer
     queryset = Basket.objects.select_related(
-        "product", "product__category"
+        "product", "product__category", "user"
     ).prefetch_related(
         "product__tags", "product__images", "product__reviews", "product__sales"
     )
 
+    @extend_schema(
+        request=InBasketSerializer,
+        responses={
+            200: OutBasketSerializer(many=True),
+            400: OpenApiResponse(description="Неверный запрос."),
+        },
+        description="Создание корзины.",
+        tags=("Basket",),
+    )
     def post(self, request: Request) -> Response:
         """
         Создание корзины.
@@ -57,6 +83,12 @@ class BasketAPIView(APIView):
 
         return Response(self.basket_out_serializer(all_baskets, many=True).data)
 
+    @extend_schema(
+        request=None,
+        responses=OutBasketSerializer(many=True),
+        description="Получение списка корзин.",
+        tags=("Basket",),
+    )
     def get(self, request: Request) -> Response:
         """
         Получение списка корзин.
@@ -72,6 +104,14 @@ class BasketAPIView(APIView):
 
         return Response(self.basket_out_serializer(all_baskets, many=True).data)
 
+    @extend_schema(
+        responses={
+            200: OutBasketSerializer(many=True),
+            400: OpenApiResponse(description="Неверный запрос."),
+        },
+        description="Удаление единицы продукта из корзины. При количестве товара равное 0, удаляется сама корзина.",
+        tags=("Basket",),
+    )
     def delete(self, request: Request) -> Response:
         """
         Удаление единицы продукта из корзины.

@@ -156,6 +156,7 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Учебный проект",
     "VERSION": "1.0.0",
 }
+
 FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
 
 # LOGGING = {

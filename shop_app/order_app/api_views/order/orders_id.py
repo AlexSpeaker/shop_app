@@ -13,7 +13,16 @@ class OrderIdAPIView(APIView):
     OrderId APIView
     """
 
-    queryset = Order.objects.prefetch_related("baskets")
+    queryset = Order.objects.select_related("user").prefetch_related(
+        "baskets",
+        "baskets__product",
+        "baskets__product__category",
+        "baskets__user",
+        "baskets__product__tags",
+        "baskets__product__images",
+        "baskets__product__reviews",
+        "baskets__product__sales",
+    )
     order_out_serializer = OutOrderSerializer
     order_in_serializer = InOrderSerializer
 
@@ -44,6 +53,5 @@ class OrderIdAPIView(APIView):
         serializer = self.order_in_serializer(data=request.data)
         if not serializer.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        print(serializer.validated_data)
         serializer.update(order, serializer.validated_data)
         return Response({"orderId": order.pk})
