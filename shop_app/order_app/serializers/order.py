@@ -51,9 +51,12 @@ class OutOrderSerializer(serializers.ModelSerializer[Order]):
             sum(
                 [
                     (
-                        (basket.fixed_price
-                        if basket.fixed_price
-                        else basket.product.get_actual_price()) * basket.count
+                        (
+                            basket.fixed_price
+                            if basket.fixed_price
+                            else basket.product.get_actual_price()
+                        )
+                        * basket.count
                     )
                     for basket in obj.baskets.all()
                 ]

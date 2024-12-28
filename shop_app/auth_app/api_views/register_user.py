@@ -1,6 +1,7 @@
 from auth_app.serializers.register_user import RegisterUserSerializer
 from django.contrib.auth import login
 from drf_spectacular.utils import OpenApiResponse, extend_schema
+from order_app.api_views.utils import merge_baskets, order_anonymous_to_user
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -40,4 +41,6 @@ class RegisterUserAPIView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         user = user_serializer.create(user_serializer.validated_data)
         login(request, user)
+        merge_baskets(user, request)
+        order_anonymous_to_user(user, request)
         return Response(status=status.HTTP_200_OK)

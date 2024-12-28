@@ -15,6 +15,7 @@ class InPaymentSerializer(serializers.Serializer[Dict[str, Any]]):
     """
     Serializer Payment входящих данных.
     """
+
     number = serializers.CharField(
         max_length=16, required=True, validators=[CardNumberValidator()]
     )

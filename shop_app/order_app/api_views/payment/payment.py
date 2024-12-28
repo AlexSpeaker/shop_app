@@ -2,20 +2,20 @@ from typing import Optional
 
 from django.db import transaction
 from drf_spectacular.utils import OpenApiResponse, extend_schema
+from order_app.models import Basket
+from order_app.models.order import Order
+from order_app.serializers.payment import InPaymentSerializer
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from order_app.models import Basket
-from order_app.models.order import Order
-from order_app.serializers.payment import InPaymentSerializer
 
 
 class PaymentAPIView(APIView):
     """
     Payment APIView
     """
+
     payment_in_serializer = InPaymentSerializer
     queryset = Order.objects.prefetch_related(
         "baskets",
@@ -51,8 +51,10 @@ class PaymentAPIView(APIView):
             if not serializer.is_valid():
                 print(serializer.errors)
                 return Response(status=status.HTTP_400_BAD_REQUEST)
-            order: Optional[Order] = self.queryset.select_for_update().filter(pk=order_id).first()
-            if not order:
+            order: Optional[Order] = (
+                self.queryset.select_for_update().filter(pk=order_id).first()
+            )
+            if not order or order.paid_for:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             baskets = order.baskets.all()
             for basket in baskets:

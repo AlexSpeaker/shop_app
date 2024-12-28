@@ -1,6 +1,7 @@
 from auth_app.serializers.login_user import LoginUserSerializer
 from django.contrib.auth import authenticate, login
 from drf_spectacular.utils import OpenApiResponse, extend_schema
+from order_app.api_views.utils import merge_baskets, order_anonymous_to_user
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -44,4 +45,6 @@ class UserLoginAPIView(APIView):
         if not user:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         login(request, user)
+        merge_baskets(user, request)
+        order_anonymous_to_user(user, request)
         return Response(status=status.HTTP_200_OK)
