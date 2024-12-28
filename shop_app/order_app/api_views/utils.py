@@ -58,4 +58,7 @@ def order_anonymous_to_user(user: AbstractBaseUser, request: Request) -> None:
     for order in orders:
         order.user = user
         order.session_id = None
-    Order.objects.bulk_update(orders, ["session_id", "user"])
+        order.full_name = user.profile.full_name
+        order.email = user.profile.email
+        order.phone = user.profile.phone
+    Order.objects.bulk_update(orders, ["session_id", "user", "full_name", "email", "phone"])
