@@ -71,6 +71,7 @@ class Sale(models.Model):
             sales = Sale.objects.filter(
                 Q(date_from__lte=timezone.now().date())
                 & Q(date_to__gte=timezone.now().date())
+                & Q(product=self.product)
             ).count()
             if sales:
                 raise ValidationError(

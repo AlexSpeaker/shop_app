@@ -50,6 +50,8 @@ class YearValidator:
         :return: None.
         """
         current_year = timezone.now().year
+        if len(str(value)) == 2:
+            value = int(str(current_year)[:2] + str(value))
         if value < current_year:
             raise ValidationError("Год должен быть не меньше текущего года.")
 
@@ -76,6 +78,8 @@ class ExpiryDateValidator:
         """
         month = int(data["month"])
         year = int(data["year"])
+        if len(str(year)) == 2:
+            year = int(str(timezone.now().year)[:2] + str(year))
         current_date = timezone.now()
         expiry_date = datetime(year, month, 1, tzinfo=current_date.tzinfo)
 
