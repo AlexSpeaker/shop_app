@@ -92,8 +92,14 @@ class InOrderSerializer(serializers.ModelSerializer[Order]):
             "address": {"required": True},
         }
 
-class OutOrderIDSerializer(serializers.Serializer):
+
+class OutOrderIDSerializer(serializers.Serializer[Order]):
     """
     Serializer Order ID исходящих данных.
     """
+
     orderId = serializers.IntegerField(read_only=True, source="pk")
+
+    class Meta:
+        fields = ("orderId",)
+        model = Order

@@ -42,7 +42,9 @@ class TagAPIView(APIView):
 
         category_id = request.query_params.get("category", None)
         if category_id:
-            id_serializer = self.id_category_serializer(data={"category_id": category_id})
+            id_serializer = self.id_category_serializer(
+                data={"category_id": category_id}
+            )
             if not id_serializer.is_valid():
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 

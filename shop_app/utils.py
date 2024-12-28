@@ -161,6 +161,7 @@ class CustomAutoSchema(AutoSchema):
     Теперь этот класс будет показывать в документации api/schema/swagger-ui/
     наш метод delete с request body.
     """
+
     def _get_request_body(self, direction="request"):
         request_serializer = self.get_request_serializer()
         request_body_required = True

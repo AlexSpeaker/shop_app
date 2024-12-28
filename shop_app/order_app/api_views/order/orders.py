@@ -2,8 +2,7 @@ from typing import Optional
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db.models import Q
-from drf_spectacular.utils import extend_schema, OpenApiResponse
-
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from order_app.models import Basket
 from order_app.models.order import Order
 from order_app.serializers.order import OutOrderSerializer
@@ -30,7 +29,6 @@ class OrderAPIView(APIView):
         "baskets__product__sales",
     )
     order_out_serializer = OutOrderSerializer
-
 
     @staticmethod
     @extend_schema(

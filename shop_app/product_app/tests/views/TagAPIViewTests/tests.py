@@ -48,7 +48,6 @@ class TagAPIViewTests(APITestCase):
         response: Response = self.client.get(self.url, data={"category": "s"})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-
     def test_get_tags(self) -> None:
         """
         Проверим, что TagAPIView возвращает то, что от неё ожидаем.
