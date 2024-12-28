@@ -91,3 +91,9 @@ class InOrderSerializer(serializers.ModelSerializer[Order]):
             "city": {"required": True},
             "address": {"required": True},
         }
+
+class OutOrderIDSerializer(serializers.Serializer):
+    """
+    Serializer Order ID исходящих данных.
+    """
+    orderId = serializers.IntegerField(read_only=True, source="pk")

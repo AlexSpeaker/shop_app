@@ -2,6 +2,8 @@ from typing import Optional
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db.models import Q
+from drf_spectacular.utils import extend_schema, OpenApiResponse
+
 from order_app.models import Basket
 from order_app.models.order import Order
 from order_app.serializers.order import OutOrderSerializer
@@ -29,7 +31,14 @@ class OrderAPIView(APIView):
     )
     order_out_serializer = OutOrderSerializer
 
+
     @staticmethod
+    @extend_schema(
+        request=None,
+        responses=order_out_serializer(many=True),
+        description="Создание заказа. Объединяет созданные корзины в заказ.",
+        tags=("Order",),
+    )
     def post(request: Request) -> Response:
         """
         Создание заказа.
@@ -54,9 +63,19 @@ class OrderAPIView(APIView):
         order.baskets.add(*all_baskets)
         return Response({"orderId": order.pk})
 
+    @extend_schema(
+        request=None,
+        responses={
+            200: order_out_serializer(many=True),
+            400: OpenApiResponse(description="Неверный запрос."),
+        },
+        description="Получение списка заказов. Только для пользователей, которые прошли аутентификацию.",
+        tags=("Order",),
+    )
     def get(self, request: Request) -> Response:
         """
         Получение списка заказов.
+        Только для пользователей, которые прошли аутентификацию.
 
         :param request: Request.
         :return: Response.
