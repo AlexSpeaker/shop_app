@@ -71,10 +71,10 @@ class InOrderSerializer(serializers.ModelSerializer[Order]):
 
     fullName = serializers.CharField(write_only=True, source="full_name", required=True)
     deliveryType = serializers.CharField(
-        write_only=True, source="delivery_type", required=True
+        write_only=True, source="delivery_type", allow_null=True
     )
     paymentType = serializers.CharField(
-        write_only=True, source="payment_type", required=True
+        write_only=True, source="payment_type", allow_null=True
     )
 
     class Meta:

@@ -1,9 +1,9 @@
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Dict
 
 from django.contrib import admin, messages
 from django.db import transaction
 from django.db.models import QuerySet
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest
 from order_app.models import Basket
 from product_app.models import Product
 
@@ -21,7 +21,7 @@ class BasketAdmin(ModelAdmin):
     Класс админка для корзины продуктов.
     """
 
-    list_display = ("pk", "product_name", "count", "order")
+    list_display = ("pk", "product_name", "count", "order", "created_at")
     list_display_links = (
         "pk",
         "product_name",
@@ -38,16 +38,17 @@ class BasketAdmin(ModelAdmin):
         """
         return obj.product.title
 
-    def get_queryset(self, request: HttpRequest) -> QuerySet[Basket, Basket]:
+    def get_queryset(self, *args: Any, **kwargs: Any) -> QuerySet[Basket]:
         """
         Получение queryset.
 
-        :param request: HttpRequest.
-        :return: QuerySet[Basket, Basket].
+        :param args: Any.
+        :param kwargs: Any.
+        :return: QuerySet[Basket].
         """
         return (
             super()
-            .get_queryset(request)
+            .get_queryset(*args, **kwargs)
             .select_related("order")
             .prefetch_related("product")
         )
@@ -98,14 +99,24 @@ class BasketAdmin(ModelAdmin):
         """
         if all(basket.order is None for basket in queryset):
             with transaction.atomic():
-                products = []
+                products: Dict[str, Product] = dict()
                 for basket in queryset:
-                    product = basket.product
+                    product = products.setdefault(str(basket.product.pk), basket.product)
                     product.count += basket.count
-                    products.append(product)
-                Product.objects.bulk_update(products, ["count"])
+                Product.objects.bulk_update(products.values(), ["count"])
                 queryset.delete()
         else:
             messages.set_level(request, messages.ERROR)
             message = "Одна или более корзин привязана к заказу. Удаление запрещено."
             self.message_user(request, message, level=messages.ERROR)
+
+    @staticmethod
+    def has_change_permission(*args: Any, **kwargs: Any) -> bool:
+        """
+        Запрещаем редактирование.
+
+        :param args: Any.
+        :param kwargs: Any.
+        :return: bool.
+        """
+        return False
