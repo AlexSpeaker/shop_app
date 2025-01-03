@@ -1,10 +1,10 @@
 from typing import TYPE_CHECKING, Any, Dict
-from django.utils.translation import gettext_lazy as _
+
 from django.contrib import admin
 from django.db import transaction
 from django.db.models import QuerySet
 from django.http import HttpRequest
-
+from django.utils.translation import gettext_lazy as _
 from order_app.models import Basket
 from order_app.models.order import Order
 from product_app.models import Product
@@ -18,6 +18,7 @@ else:
     ModelAdmin = admin.ModelAdmin
     TabularInline = admin.TabularInline
 
+
 class BasketInline(TabularInline):
     """
     Инлайн класс для корзины.
@@ -28,14 +29,16 @@ class BasketInline(TabularInline):
     verbose_name_plural = _("Baskets")
     extra = 0
     max_num = 0
-    fields = ['product', 'count', 'user', 'session_id', 'fixed_price']
-    readonly_fields = fields
+    fields = ["product", "count", "user", "session_id", "fixed_price"]
+    readonly_fields = ["product", "count", "user", "session_id", "fixed_price"]
+
 
 @admin.register(Order)
 class OrderAdmin(ModelAdmin):
     """
     Класс админка для заказов.
     """
+
     inlines = [BasketInline]
 
     list_display = "created_at", "paid_for"
@@ -103,7 +106,9 @@ class OrderAdmin(ModelAdmin):
             if not obj.paid_for:
                 products: Dict[str, Product] = dict()
                 for basket in obj.baskets.all():
-                    product = products.setdefault(str(basket.product.pk), basket.product)
+                    product = products.setdefault(
+                        str(basket.product.pk), basket.product
+                    )
                     product.count += basket.count
                 Product.objects.bulk_update(products.values(), ["count"])
             super().delete_model(request, obj)
@@ -120,7 +125,9 @@ class OrderAdmin(ModelAdmin):
             for order in queryset:
                 if not order.paid_for:
                     for basket in order.baskets.all():
-                        product = products.setdefault(str(basket.product.pk), basket.product)
+                        product = products.setdefault(
+                            str(basket.product.pk), basket.product
+                        )
                         product.count += basket.count
             if products:
                 Product.objects.bulk_update(products.values(), ["count"])

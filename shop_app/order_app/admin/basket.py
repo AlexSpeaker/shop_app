@@ -101,7 +101,9 @@ class BasketAdmin(ModelAdmin):
             with transaction.atomic():
                 products: Dict[str, Product] = dict()
                 for basket in queryset:
-                    product = products.setdefault(str(basket.product.pk), basket.product)
+                    product = products.setdefault(
+                        str(basket.product.pk), basket.product
+                    )
                     product.count += basket.count
                 Product.objects.bulk_update(products.values(), ["count"])
                 queryset.delete()
