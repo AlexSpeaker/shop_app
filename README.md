@@ -19,3 +19,5 @@ ___
 - В папке **shop_app** выполняем команду: **python manage.py runserver**
 - Вход в админку **http:/.../admin**
 - Swagger документация - **http:/.../api/schema/swagger-ui/**
+
+&#169;AlexSokolov 2025
